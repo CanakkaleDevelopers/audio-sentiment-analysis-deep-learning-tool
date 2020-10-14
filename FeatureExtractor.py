@@ -56,7 +56,7 @@ class FeatureExtractor:
 
         warnings.filterwarnings("ignore")
 
-        if args.len == 0:
+        if len(args) == 0:
             print("You need to extract at least one feature")
             return
 
