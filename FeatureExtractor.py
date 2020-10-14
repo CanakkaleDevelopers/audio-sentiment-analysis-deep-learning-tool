@@ -54,7 +54,11 @@ class FeatureExtractor:
         """
         import warnings
 
-        warnings.filterwarnings("ignore",UserWarning)
+        warnings.filterwarnings("ignore")
+
+        if args.len == 0:
+            print("You need to extract at least one feature")
+            return
 
         data = FeatureExtractor.read_audio(file_path)
         #data , _ = librosa.load(file_path,sr=conf.PreproccessConfig.sampling_rate)
