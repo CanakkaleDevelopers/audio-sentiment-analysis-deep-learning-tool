@@ -24,7 +24,7 @@ class FeatureExtractor:
         return y
 
     @staticmethod
-    def extract(file_path, *args, normalize=False):
+    def extract(file_path, features , normalize=False):
 
         """
         Ses dosyasının özniteliklerini döndürür.
@@ -33,7 +33,7 @@ class FeatureExtractor:
 
         file_path (string) : dosyanın yolu
 
-        *args (list) : [mfcc,chroma,zcr,mel,contrast,tonnetz]
+        features (list) : [mfcc,chroma,zcr,mel,contrast,tonnetz]
 
         mfccs (numpy.array) : mel Mel frekans ölçeği, insan kulağının ses frekanslarındaki değişimi algılayışını gösteren bir ölçektir.
         chroma (numpy.array) : Spektrum müzikal oktavının 12 farklı yarı tonunu(chroma) temsil eden 12 parçanın belirtildiği ses için güçlü bir sunumudur.
@@ -56,7 +56,7 @@ class FeatureExtractor:
 
         warnings.filterwarnings("ignore")
 
-        if len(args) == 0:
+        if len(features) == 0:
             print("You need to extract at least one feature")
             return
 
@@ -67,19 +67,19 @@ class FeatureExtractor:
         # Get features
         sample_rate = conf.PreproccessConfig.sampling_rate
         stft = np.abs(librosa.stft(data))
-        if "mfcc" in args: mfcc = np.mean(librosa.feature.mfcc(y=data, sr=sample_rate, n_mfcc=40).T,
+        if "mfcc" in features: mfcc = np.mean(librosa.feature.mfcc(y=data, sr=sample_rate, n_mfcc=40).T,
                                           axis=0)  # 40 values
-        if "chroma" in args: chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
-        if "mel" in args: mel = np.mean(librosa.feature.melspectrogram(data, sr=sample_rate).T, axis=0)
-        if "contrast" in args: contrast = np.mean(librosa.feature.spectral_contrast(S=stft, sr=sample_rate).T, axis=0)
-        if "tonnetz" in args: tonnetz = np.mean(
+        if "chroma" in features: chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
+        if "mel" in features: mel = np.mean(librosa.feature.melspectrogram(data, sr=sample_rate).T, axis=0)
+        if "contrast" in features: contrast = np.mean(librosa.feature.spectral_contrast(S=stft, sr=sample_rate).T, axis=0)
+        if "tonnetz" in features: tonnetz = np.mean(
             librosa.feature.tonnetz(y=librosa.effects.harmonic(data), sr=sample_rate).T,  # tonal centroid features
             axis=0)
 
         # öznitelik dizimizin uzunlugunu hesaplayalım
 
         extracted_features = []
-        if 'mfcc' in locals(): extracted_features = np.hstack([extracted_features, mfcc])
+        if 'mfcc' in locals(): extracted_features = np.hstack([extracted_features, mfcc ])
         if 'chroma' in locals(): extracted_features = np.hstack([extracted_features, chroma])
         if 'mel' in locals(): extracted_features = np.hstack([extracted_features, mel])
         if 'contrast' in locals(): extracted_features = np.hstack([extracted_features, contrast])
@@ -111,3 +111,43 @@ class FeatureExtractor:
             if show_in_console:
                 pass
         return spectrogram
+
+    @staticmethod
+    def extract_ravdess():
+        import os
+
+        root_path = conf.FilePathConfig.RAVDESS_FILES_PATH
+
+        save_path = conf.FilePathConfig.SAVE_DIR_PATH
+        features_list = []
+        for subdir, dirs, files in os.walk(root_path):
+            for file in files:
+                try:
+                    features = FeatureExtractor.extract(os.path.join(subdir,file),conf.PreproccessConfig.desired_features)[0] # 0-> feature 1 -> lenght of arr
+                    emotion_code = int(file[7:8]) - 1 # 0-7 emotions
+                    arr = features, emotion_code
+                    features_list.append(arr)
+                    print(arr)
+                # dosya adı vs yanlıs olması veya islenememesi durumunda işlem durmamalı
+                except ValueError as err:
+                    print(err)
+                    continue
+
+        X,y = zip(*features_list)
+
+        X, y = np.asarray(X), np.asarray(y)
+
+        print(X.shape, y.shape)
+
+        _name, y_name = 'ravdessX.joblib', 'ravdessY.joblib'
+
+        import joblib # disk dump
+
+        joblib.dump(X, os.path.join(save_dir, X_name))
+        joblib.dump(y, os.path.join(save_dir, y_name))
+
+
+
+
+
+
