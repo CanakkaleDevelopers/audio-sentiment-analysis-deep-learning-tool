@@ -24,7 +24,7 @@ class FeatureExtractor:
         return y
 
     @staticmethod
-    def extract(file_path, features , normalize=False):
+    def extract(file_path, features, normalize=False):
 
         """
         Ses dosyasının özniteliklerini döndürür.
@@ -40,6 +40,7 @@ class FeatureExtractor:
         mel (numpy.array) : mel spektogram verisi
         contrast (numpy.array) :
         tonnetz (numpy.array) :
+        mfcc_delta (numpy.array) : girdi verilerinin türevinin yerel tahmini
 
         Returns :
 
@@ -48,8 +49,8 @@ class FeatureExtractor:
 
         Example use :
 
-        FeatureExtractor.extract("example_audio.ogg",'mfcc','chroma') ||
-        FeatureExtractor.extract("example_audio.ogg",'mfcc', normalize = True )
+        FeatureExtractor.extract("example_audio.ogg",['mfcc''chroma']) ||
+        FeatureExtractor.extract("example_audio.ogg",['mfcc'], normalize = True )
 
         """
         import warnings
@@ -61,36 +62,41 @@ class FeatureExtractor:
             return
 
         data = FeatureExtractor.read_audio(file_path)
-        #data , _ = librosa.load(file_path,sr=conf.PreproccessConfig.sampling_rate)
+        # data , _ = librosa.load(file_path,sr=conf.PreproccessConfig.sampling_rate)
         data = (data[:, 0] if data.ndim > 1 else data.T)
 
         # Get features
         sample_rate = conf.PreproccessConfig.sampling_rate
         stft = np.abs(librosa.stft(data))
-        if "mfcc" in features: mfcc = np.mean(librosa.feature.mfcc(y=data, sr=sample_rate, n_mfcc=40).T,
-                                          axis=0)  # 40 values
+        if "mfcc" in features: mfcc = np.mean(librosa.feature.mfcc(y=data, sr=sample_rate, n_mfcc=conf.PreproccessConfig.n_mfcc).T,
+                                              axis=0)  # 40 values
         if "chroma" in features: chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
         if "mel" in features: mel = np.mean(librosa.feature.melspectrogram(data, sr=sample_rate).T, axis=0)
-        if "contrast" in features: contrast = np.mean(librosa.feature.spectral_contrast(S=stft, sr=sample_rate).T, axis=0)
+        if "contrast" in features: contrast = np.mean(librosa.feature.spectral_contrast(S=stft, sr=sample_rate).T,
+                                                      axis=0)
         if "tonnetz" in features: tonnetz = np.mean(
             librosa.feature.tonnetz(y=librosa.effects.harmonic(data), sr=sample_rate).T,  # tonal centroid features
             axis=0)
 
+        if "mfcc_delta" in  features : mfcc_delta =  np.mean(librosa.feature.delta(librosa.feature.mfcc(y=data, sr=sample_rate)))
+
+
         # öznitelik dizimizin uzunlugunu hesaplayalım
 
         extracted_features = []
-        if 'mfcc' in locals(): extracted_features = np.hstack([extracted_features, mfcc ])
+        if 'mfcc' in locals(): extracted_features = np.hstack([extracted_features, mfcc])
         if 'chroma' in locals(): extracted_features = np.hstack([extracted_features, chroma])
         if 'mel' in locals(): extracted_features = np.hstack([extracted_features, mel])
         if 'contrast' in locals(): extracted_features = np.hstack([extracted_features, contrast])
         if 'tonnetz' in locals(): extracted_features = np.hstack([extracted_features, tonnetz])
+        if 'mfcc_delta' in locals(): extracted_features = np.hstack([extracted_features, mfcc_delta])
 
         lenght = len(extracted_features)
 
         return extracted_features, lenght
 
     @staticmethod
-    def extractSpectogram(file_path, save=False, show_in_console = False):
+    def extractSpectogram(file_path, save=False, show_in_console=False):
         """
         Mel spektogram görüntüsünü döndürür.
         """
@@ -104,7 +110,7 @@ class FeatureExtractor:
                                                      fmax=conf.PreproccessConfig.fmax)
         spectrogram = librosa.power_to_db(spectrogram)
         spectrogram = spectrogram.astype(np.float32)
-
+        
         if save:
             # todo -> kaydetmeyi ve konsolda göstermeyi ekle
             pass
@@ -123,8 +129,10 @@ class FeatureExtractor:
         for subdir, dirs, files in os.walk(root_path):
             for file in files:
                 try:
-                    features = FeatureExtractor.extract(os.path.join(subdir,file),conf.PreproccessConfig.desired_features)[0] # 0-> feature 1 -> lenght of arr
-                    emotion_code = int(file[7:8]) - 1 # 0-7 emotions
+                    features = \
+                    FeatureExtractor.extract(os.path.join(subdir, file), conf.PreproccessConfig.desired_features)[
+                        0]  # 0-> feature 1 -> lenght of arr
+                    emotion_code = int(file[7:8]) - 1  # 0-7 emotions
                     arr = features, emotion_code
                     features_list.append(arr)
                     print(arr)
@@ -133,21 +141,18 @@ class FeatureExtractor:
                     print(err)
                     continue
 
-        X,y = zip(*features_list)
+        X, y = zip(*features_list)
 
         X, y = np.asarray(X), np.asarray(y)
 
         print(X.shape, y.shape)
 
-        _name, y_name = 'ravdessX.joblib', 'ravdessY.joblib'
+        x_name, y_name = 'ravdessX.joblib', 'ravdessY.joblib'
 
-        import joblib # disk dump
+        import joblib  # disk dump
 
-        joblib.dump(X, os.path.join(save_dir, X_name))
-        joblib.dump(y, os.path.join(save_dir, y_name))
-
-
+        joblib.dump(X, os.path.join(save_path, x_name))
+        joblib.dump(y, os.path.join(save_path, y_name))
 
 
-
-
+""
