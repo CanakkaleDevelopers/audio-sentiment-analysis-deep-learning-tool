@@ -11,21 +11,17 @@ class Config:
         samples = sampling_rate * duration
         desired_features = ['mfcc']
         is_Spectogram_selected = False
-
-        @classmethod
-        def get_preproccess_conf(cls):
-            conf_dict = {"sampling_rate": cls.sampling_rate,
-                         "duration": cls.duration,
-                         "hop_lenght": cls.hop_length,
-                         "fmin": cls.fmin,
-                         "fmax": cls.fmax,
-                         "n_mels": cls.n_mels,
-                         "n_fft": cls.n_fft,
-                         "samples": cls.samples}
+        spectogram_file_extension = 'png'
 
         @classmethod
         def feature_count(cls):
             return len(cls.selected_features)
+
+    class DataAugmentationConfig:
+        augment_data = False
+        augmentations = ['addWhiteNoise','Shift']
+        shift_rate = 1600
+        strectch_rate = 1
 
     class FilePathConfig:
         import sys
@@ -35,12 +31,14 @@ class Config:
 
         if sys.platform.startswith('win32'):
             TRAINING_FILES_PATH = str(working_dir_path) + '\\pass\\'
+            TRAINING_FILES_SPECTOGRAMS = str(working_dir_path) + '\\ExtractedFeatures\\Spectogram\\'
             SAVE_DIR_PATH = str(working_dir_path) + '\\ExtractedFeatues\\'
             MODEL_DIR_PATH = str(working_dir_path) + '\\pass\\'
             TEST_FILES_PATH = str(working_dir_path) + '\\pass\\'
             RAVDESS_FILES_PATH = str(working_dir_path) + '\\Datasets\\Ravdess'
         else:
             TRAINING_FILES_PATH = str(working_dir_path) + '/pass/'
+            TRAINING_FILES_SPECTOGRAMS = str(working_dir_path) + '/ExtractedFeatures/Spectogram'
             SAVE_DIR_PATH = str(working_dir_path) + '/ExtractedFeatues/'
             MODEL_DIR_PATH = str(working_dir_path) + '/pass/'
             TEST_FILES_PATH = str(working_dir_path) + '/pass/'

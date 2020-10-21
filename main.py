@@ -14,7 +14,10 @@ def main():
     from sklearn.preprocessing import normalize as sklearnnormalize
     from librosa.util import normalize as libnormalize
 
-
+    ##print(FeatureExtractor.extractSpectogram.__doc__)
+    from DataAugmentator import DataAugmentator
+    #DataAugmentator.shift(FeatureExtractor.read_audio('example_audio.ogg'))
+    DataAugmentator.plot_time_series(DataAugmentator.stretch(FeatureExtractor.read_audio('example_audio.ogg')))
 
 
 

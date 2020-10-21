@@ -2,7 +2,11 @@ import librosa
 import numpy as np
 import pandas as pd
 from Config import Config as conf
+import skimage.io
+import os
+import warnings
 
+from DataAugmentator import DataAugmentator
 
 class FeatureExtractor:
 
@@ -24,7 +28,7 @@ class FeatureExtractor:
         return y
 
     @staticmethod
-    def extract(file_path, features, normalize=False):
+    def extract(file_path, features, augmentation=None, normalize=False):
 
         """
         Ses dosyasının özniteliklerini döndürür.
@@ -33,7 +37,10 @@ class FeatureExtractor:
 
         file_path (string) : dosyanın yolu
 
-        features (list) : [mfcc,chroma,zcr,mel,contrast,tonnetz]
+        features (list) : [mfcc,chroma,zcr,mel,contrast,tonnetz] len(features) => 1 olmalı
+
+        augmentation (list) : ['white_noise' , 'stretch','shift'] , default : None
+
 
         mfccs (numpy.array) : mel Mel frekans ölçeği, insan kulağının ses frekanslarındaki değişimi algılayışını gösteren bir ölçektir.
         chroma (numpy.array) : Spektrum müzikal oktavının 12 farklı yarı tonunu(chroma) temsil eden 12 parçanın belirtildiği ses için güçlü bir sunumudur.
@@ -53,7 +60,6 @@ class FeatureExtractor:
         FeatureExtractor.extract("example_audio.ogg",['mfcc'], normalize = True )
 
         """
-        import warnings
 
         warnings.filterwarnings("ignore")
 
@@ -65,11 +71,22 @@ class FeatureExtractor:
         # data , _ = librosa.load(file_path,sr=conf.PreproccessConfig.sampling_rate)
         data = (data[:, 0] if data.ndim > 1 else data.T)
 
+        # eğer data augmentation varsa veriye manipüle et yoksa devam
+        if 'white_noise' in augmentation:
+            data = DataAugmentator.add_white_noise(data)
+        elif 'stretch' in augmentation:
+            data = DataAugmentator.stretch(data)
+        elif 'shift' in augmentation:
+            data = DataAugmentator.shift(data)
+        else:
+            pass
+
         # Get features
         sample_rate = conf.PreproccessConfig.sampling_rate
         stft = np.abs(librosa.stft(data))
-        if "mfcc" in features: mfcc = np.mean(librosa.feature.mfcc(y=data, sr=sample_rate, n_mfcc=conf.PreproccessConfig.n_mfcc).T,
-                                              axis=0)  # 40 values
+        if "mfcc" in features: mfcc = np.mean(
+            librosa.feature.mfcc(y=data, sr=sample_rate, n_mfcc=conf.PreproccessConfig.n_mfcc).T,
+            axis=0)  # 40 values
         if "chroma" in features: chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
         if "mel" in features: mel = np.mean(librosa.feature.melspectrogram(data, sr=sample_rate).T, axis=0)
         if "contrast" in features: contrast = np.mean(librosa.feature.spectral_contrast(S=stft, sr=sample_rate).T,
@@ -78,8 +95,8 @@ class FeatureExtractor:
             librosa.feature.tonnetz(y=librosa.effects.harmonic(data), sr=sample_rate).T,  # tonal centroid features
             axis=0)
 
-        if "mfcc_delta" in  features : mfcc_delta =  np.mean(librosa.feature.delta(librosa.feature.mfcc(y=data, sr=sample_rate)))
-
+        if "mfcc_delta" in features: mfcc_delta = np.mean(
+            librosa.feature.delta(librosa.feature.mfcc(y=data, sr=sample_rate)))
 
         # öznitelik dizimizin uzunlugunu hesaplayalım
 
@@ -96,11 +113,37 @@ class FeatureExtractor:
         return extracted_features, lenght
 
     @staticmethod
-    def extractSpectogram(file_path, save=False, show_in_console=False):
+    def extractSpectogram(file_path, augmentation = None, save=False, show_in_console=False):
         """
-        Mel spektogram görüntüsünü döndürür.
+        Mel spektogram görüntüsünü config dosyasındaki spectogram konumuna kaydeder,
+        görüntüler insan tarafından değil  makine tarafından okunmak adına, x,y label isimleri vs barındırmaz.
+        dosyanın adı audio dosyasının kendi adı ve uzantısı 'png' dir.
+
+        Parameters
+
+        file_path (str) : dosyanın yolu
+        augmentation (list) : ['white_noise' , 'stretch','shift'] , default : None
+
+        Returns & Saves
+
+        no return -void-
+
+        spectogram file (file) : filename.desired_image_extension
+
         """
+        warnings.filterwarnings("ignore")
         audio = FeatureExtractor.read_audio(file_path)
+
+        # eğer data augmentation varsa veriye manipüle et yoksa devam
+        if 'white_noise' in augmentation:
+            audio = DataAugmentator.add_white_noise(audio)
+        elif 'stretch' in augmentation:
+            audio = DataAugmentator.stretch(audio)
+        elif 'shift' in augmentation:
+            audio = DataAugmentator.shift(audio)
+        else:
+            pass
+
         spectrogram = librosa.feature.melspectrogram(audio,
                                                      sr=conf.PreproccessConfig.sampling_rate,
                                                      n_mels=conf.PreproccessConfig.n_mels,
@@ -108,15 +151,25 @@ class FeatureExtractor:
                                                      n_fft=conf.PreproccessConfig.n_fft,
                                                      fmin=conf.PreproccessConfig.fmin,
                                                      fmax=conf.PreproccessConfig.fmax)
-        spectrogram = librosa.power_to_db(spectrogram)
-        spectrogram = spectrogram.astype(np.float32)
-        
-        if save:
-            # todo -> kaydetmeyi ve konsolda göstermeyi ekle
-            pass
-            if show_in_console:
-                pass
-        return spectrogram
+        spectrogram = np.log(spectrogram + 1e-9)  # add small number to avoid log(0)
+
+        img = FeatureExtractor.scale_minmax(spectrogram, 0, 255).astype(np.uint8)
+        img = np.flip(img, axis=0)  # put low frequencies at the bottom in image
+        img = 255 - img  # invert. make black==more energy
+
+        save_path = conf.FilePathConfig.TRAINING_FILES_SPECTOGRAMS
+        file_name = os.path.basename(file_path).split('.')[0]  # file name without extension
+        file_name = '{}.{}'.format(file_name,
+                                   conf.PreproccessConfig.spectogram_file_extension)  # file name and extension default : png for write
+        out = os.path.join(save_path, file_name)  # file name with png extension
+        print(out)
+        skimage.io.imsave(out, img)
+
+    @staticmethod
+    def scale_minmax(X, min=0.0, max=1.0):
+        X_std = (X - X.min()) / (X.max() - X.min())
+        X_scaled = X_std * (max - min) + min
+        return X_scaled
 
     @staticmethod
     def extract_ravdess():
@@ -130,8 +183,8 @@ class FeatureExtractor:
             for file in files:
                 try:
                     features = \
-                    FeatureExtractor.extract(os.path.join(subdir, file), conf.PreproccessConfig.desired_features)[
-                        0]  # 0-> feature 1 -> lenght of arr
+                        FeatureExtractor.extract(os.path.join(subdir, file), conf.PreproccessConfig.desired_features)[
+                            0]  # 0-> feature 1 -> lenght of arr
                     emotion_code = int(file[7:8]) - 1  # 0-7 emotions
                     arr = features, emotion_code
                     features_list.append(arr)
