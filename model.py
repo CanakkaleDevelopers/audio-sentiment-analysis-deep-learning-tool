@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import Input, Model, Sequential, layers
 from tensorflow.keras.layers import (LSTM, BatchNormalization, Concatenate,
-                                     Conv2D, Dense, Dropout, Flatten,
+                                     Conv2D, Dense, Dropout, Reshape, Flatten,
                                      MaxPooling2D)
 
 path = "r.wav"
@@ -28,106 +28,89 @@ logspec = np.expand_dims(logspec, 0)
 logspec = np.expand_dims(logspec, -1)
 
 
-# def cnn_model():
-#     model = Sequential([
-#         Conv2D(filters=32, kernel_size=(3, 3), input_shape=(13, 216, 1),
-#                activation='relu', padding='same'),
-#         BatchNormalization(),
-#         Dropout(rate=0.2),
+def model_1(number_of_outputs, n_mfcc):
+    '''
+    2d cnn + lstm paralel model
+    '''
 
-#         Conv2D(filters=32, kernel_size=(3, 3),
-#                activation='relu'),
-#         BatchNormalization(),
-#         MaxPooling2D(),
-#         Dropout(rate=0.2),
+    model_input = Input(shape=(n_mfcc, 216, 1))
 
-
-#         Conv2D(filters=32, kernel_size=(3, 3),
-#                activation='relu', padding='same'),
-#         BatchNormalization(),
-#         Dropout(rate=0.2),
-
-
-#         Conv2D(filters=32, kernel_size=(3, 3),
-#                activation='relu'),
-#         BatchNormalization(),
-#         MaxPooling2D(),
-#         Dropout(rate=0.2),
-
-#         Flatten(),
-
-#         # Dense(64, activation='relu')
-#     ])
-
-#     return model
-
-
-# model_1 = cnn_model()
-# print(model_1(mfcc).shape)
-
-
-def model_2():
-
-    model_input = Input(shape=(40, 216, 1))
-
-    # 1
+    # CNN
+    # Block 1
     cnn_output = Conv2D(filters=32, kernel_size=(3, 3),
                         activation='relu', padding='same')(model_input)
     cnn_output = BatchNormalization()(cnn_output)
     cnn_output = Dropout(rate=0.2)(cnn_output)
 
-    # 2
+    # Block 2
     cnn_output = Conv2D(filters=32, kernel_size=(3, 3),
                         activation='relu')(cnn_output)
     cnn_output = BatchNormalization()(cnn_output)
     cnn_output = MaxPooling2D()(cnn_output)
     cnn_output = Dropout(rate=0.2)(cnn_output)
 
-    # 3
+    # Block 3
     cnn_output = Conv2D(filters=32, kernel_size=(3, 3),
                         activation='relu', padding='same')(cnn_output)
     cnn_output = BatchNormalization()(cnn_output)
     cnn_output = Dropout(rate=0.2)(cnn_output)
 
-    # 4
+    # Block 4
     cnn_output = Conv2D(filters=32, kernel_size=(3, 3),
                         activation='relu')(cnn_output)
     cnn_output = BatchNormalization()(cnn_output)
     cnn_output = MaxPooling2D()(cnn_output)
     cnn_output = Dropout(rate=0.2)(cnn_output)
 
-    # 5
-    cnn_output = Conv2D(filters=32, kernel_size=(3, 3),
+    # Block 5
+    cnn_output = Conv2D(filters=64, kernel_size=(3, 3),
                         activation='relu', padding='same')(cnn_output)
     cnn_output = BatchNormalization()(cnn_output)
     cnn_output = Dropout(rate=0.2)(cnn_output)
 
-    # 6
-    cnn_output = Conv2D(filters=32, kernel_size=(3, 3),
+    # Block 6
+    cnn_output = Conv2D(filters=64, kernel_size=(3, 3),
                         activation='relu')(cnn_output)
     cnn_output = BatchNormalization()(cnn_output)
     cnn_output = MaxPooling2D()(cnn_output)
     cnn_output = Dropout(rate=0.2)(cnn_output)
 
+    # LSTM
+    lstm_input = Reshape((n_mfcc, 216))(model_input)
+
+    lstm_output = LSTM(128, return_sequences=True)(
+        lstm_input)
+
+    lstm_output = LSTM(128, return_sequences=True)(lstm_output)
+
+    lstm_output = LSTM(128, return_sequences=True)(lstm_output)
+
+    # Flatten layers
+    lstm_output = Flatten()(lstm_output)
     cnn_output = Flatten()(cnn_output)
+    concat = Concatenate(axis=1)([cnn_output, lstm_output])
 
-    # merged = keras.layers.concatenate([cnn_outputt, lstm_output], axis=1)
+    # Dense
+    output = Dense(512, activation='relu')(concat)
+    output = Dense(256, activation='relu')(output)
+    output = Dense(128, activation='relu')(output)
 
-    output = Dense(64, activation='relu')(cnn_output)
-
-    output = Dense(10, activation='softmax')(output)
+    output = Dense(number_of_outputs, activation='softmax')(output)
 
     model = Model(model_input, output)
 
     model.compile(optimizer='adam',
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
-    # sparse_categorical_crossentropy
 
     return model
 
 
-model = model_2()
+m_1 = model_1(number_of_outputs=14, n_mfcc=40)
+# print(m_1.summary())
+print(m_1(mfcc))
 
-print(model(mfcc))
 
+# def model_2():
+# TODO: conv1D model
+# model_input = Input(shape=(n_mfcc, 216, 1))
