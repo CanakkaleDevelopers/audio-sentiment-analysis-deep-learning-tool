@@ -45,3 +45,8 @@ threadpoolctl @ file:///tmp/tmp79xdzxkt/threadpoolctl-2.1.0-py3-none-any.whl
 toolz @ file:///tmp/build/80754af9/toolz_1601054250827/work
 tornado @ file:///home/conda/feedstock_root/build_artifacts/tornado_1602488891005/work
 urllib3 @ file:///home/conda/feedstock_root/build_artifacts/urllib3_1595434816409/work
+
+numpy~=1.19.2
+librosa~=0.8.0
+keras~=2.4.3
+matplotlib~=3.3.1

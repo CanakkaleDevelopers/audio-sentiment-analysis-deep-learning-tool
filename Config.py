@@ -12,6 +12,9 @@ class Config:
         desired_features = ['mfcc']
         is_Spectogram_selected = False
         spectogram_file_extension = 'png'
+        isNormalized = False
+        norm_min = 0.0
+        norm_max = 1.0
 
         @classmethod
         def feature_count(cls):
@@ -22,6 +25,9 @@ class Config:
         augmentations = ['addWhiteNoise','Shift']
         shift_rate = 1600
         strectch_rate = 1
+        speed_change = 1
+        pitch_pm = 4
+        bins_per_octave = 24
 
     class FilePathConfig:
         import sys
@@ -33,14 +39,16 @@ class Config:
             TRAINING_FILES_PATH = str(working_dir_path) + '\\pass\\'
             TRAINING_FILES_SPECTOGRAMS = str(working_dir_path) + '\\ExtractedFeatures\\Spectogram\\'
             SAVE_DIR_PATH = str(working_dir_path) + '\\ExtractedFeatues\\'
-            MODEL_DIR_PATH = str(working_dir_path) + '\\pass\\'
+            MODEL_DIR_PATH = str(working_dir_path) + '\\ImplementedModels\\'
+            MODEL_WEIGHTS_PATH = str(working_dir_path) + '\\ModelWeights\\'
             TEST_FILES_PATH = str(working_dir_path) + '\\pass\\'
             RAVDESS_FILES_PATH = str(working_dir_path) + '\\Datasets\\Ravdess'
         else:
             TRAINING_FILES_PATH = str(working_dir_path) + '/pass/'
             TRAINING_FILES_SPECTOGRAMS = str(working_dir_path) + '/ExtractedFeatures/Spectogram'
             SAVE_DIR_PATH = str(working_dir_path) + '/ExtractedFeatues/'
-            MODEL_DIR_PATH = str(working_dir_path) + '/pass/'
+            MODEL_DIR_PATH = str(working_dir_path) + '/ImplementedModels/'
+            MODEL_WEIGHTS_PATH = str(working_dir_path) + '/ModelWeights'
             TEST_FILES_PATH = str(working_dir_path) + '/pass/'
             RAVDESS_FILES_PATH = str(working_dir_path) + '/Datasets/Ravdess'
 

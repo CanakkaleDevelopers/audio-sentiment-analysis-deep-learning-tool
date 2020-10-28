@@ -34,8 +34,26 @@ class DataAugmentator:
     @staticmethod
     def stretch(data):
         """ses verisini gererek genişletir"""
-        data = librosa.effects.time_stretch(data, conf.DataAugmentationConfig.strectch_rate)
+        sample_rate = conf.PreproccessConfig.sampling_rate
+        pitch_change = conf.DataAugmentationConfig.pitch_pm * 2 * (np.random.uniform()-0.5)
+        bins_per_octave = conf.DataAugmentationConfig.bins_per_octave
+        data = librosa.effects.pitch_shift(data, sr=sample_rate, n_steps=pitch_change, bins_per_octave=bins_per_octave)
         return data
+
+    @staticmethod
+
+    def change_speed(data):
+        speed_change = conf.DataAugmentationConfig.speed_change
+        data = librosa.effects.time_stretch(data, speed_change)
+
+    @staticmethod
+    def remove_silent_regions(data):
+        data, index = librosa.effects.trim(data)
+
+
+
+
+
 
 
 

@@ -8,6 +8,7 @@ import warnings
 
 from DataAugmentator import DataAugmentator
 
+
 class FeatureExtractor:
 
     # todo -> add normalize = True
@@ -78,6 +79,8 @@ class FeatureExtractor:
             data = DataAugmentator.stretch(data)
         elif 'shift' in augmentation:
             data = DataAugmentator.shift(data)
+        elif 'change_speed' in augmentation:
+            data = DataAugmentator.change_speed(data)
         else:
             pass
 
@@ -113,7 +116,7 @@ class FeatureExtractor:
         return extracted_features, lenght
 
     @staticmethod
-    def extractSpectogram(file_path, augmentation = None, save=False, show_in_console=False):
+    def extractSpectogram(file_path, augmentation=None, save=False, show_in_console=False):
         """
         Mel spektogram görüntüsünü config dosyasındaki spectogram konumuna kaydeder,
         görüntüler insan tarafından değil  makine tarafından okunmak adına, x,y label isimleri vs barındırmaz.
@@ -141,6 +144,8 @@ class FeatureExtractor:
             audio = DataAugmentator.stretch(audio)
         elif 'shift' in augmentation:
             audio = DataAugmentator.shift(audio)
+        elif 'change_speed' in augmentation:
+            audio = DataAugmentator.change_speed(audio)
         else:
             pass
 
