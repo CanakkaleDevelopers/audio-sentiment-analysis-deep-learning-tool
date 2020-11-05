@@ -1,3 +1,4 @@
+import os
 class Config:
     class PreproccessConfig:
         sampling_rate = 44100
@@ -33,7 +34,7 @@ class Config:
         import sys
         import pathlib
 
-        working_dir_path = pathlib.Path().absolute()
+        working_dir_path = os.path.dirname(os.path.abspath(__file__))
 
         if sys.platform.startswith('win32'):
             TRAINING_FILES_PATH = str(working_dir_path) + '\\pass\\'
@@ -43,6 +44,9 @@ class Config:
             MODEL_WEIGHTS_PATH = str(working_dir_path) + '\\ModelWeights\\'
             TEST_FILES_PATH = str(working_dir_path) + '\\pass\\'
             RAVDESS_FILES_PATH = str(working_dir_path) + '\\Datasets\\Ravdess'
+            CREMA_D_FILES_PATH = str(working_dir_path) + '\\Datasets\\Crema-D'
+            SAVEE_FILES_PATH = str(working_dir_path) + '\\Datasets\\SAVEE'
+            DATATABLE_DF_PATH = str(working_dir_path) + '\\TEMP\\datatable.csv'
         else:
             TRAINING_FILES_PATH = str(working_dir_path) + '/pass/'
             TRAINING_FILES_SPECTOGRAMS = str(working_dir_path) + '/ExtractedFeatures/Spectogram'
@@ -51,6 +55,9 @@ class Config:
             MODEL_WEIGHTS_PATH = str(working_dir_path) + '/ModelWeights'
             TEST_FILES_PATH = str(working_dir_path) + '/pass/'
             RAVDESS_FILES_PATH = str(working_dir_path) + '/Datasets/Ravdess'
+            CREMA_D_FILES_PATH = str(working_dir_path) + '/Datasets/Crema-D'
+            SAVEE_FILES_PATH = str(working_dir_path) + '/Datasets/SAVEE'
+            DATATABLE_DF_PATH = str(working_dir_path) + '/TEMP/datatable.csv'
 
     class ModelTrainingConfig:
         use_pretrained_model = False

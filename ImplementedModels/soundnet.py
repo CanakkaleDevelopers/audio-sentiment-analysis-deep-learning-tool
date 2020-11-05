@@ -19,6 +19,9 @@ def load_audio(audio_file):
     return audio
 
 
+"""""                   ÇALIŞMIYOR!                    """""
+
+
 def build_model():
     """
     :return:
@@ -26,7 +29,7 @@ def build_model():
     import os
 
     path = os.path.join(Config.FilePathConfig.MODEL_WEIGHTS_PATH, 'soundnetweights.npy')
-    model_weights = np.load(path).item()
+    model_weights = np.load(path, allow_pickle=True, encoding='latin1').item()
     model = Sequential()
     model.add(InputLayer(batch_input_shape=(1, None, 1)))
 
@@ -92,4 +95,4 @@ def predict_scene_from_audio_file(audio_file):
     return model.predict(audio)
 
 
-predict_scene_from_audio_file('example_audio.ogg')
+predict_scene_from_audio_file('../example_audio.ogg')
