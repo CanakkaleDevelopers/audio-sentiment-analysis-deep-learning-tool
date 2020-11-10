@@ -1,4 +1,5 @@
 import os
+import json
 class Config:
     class PreproccessConfig:
         sampling_rate = 44100
@@ -38,29 +39,33 @@ class Config:
 
         if sys.platform.startswith('win32'):
             TRAINING_FILES_PATH = str(working_dir_path) + '\\pass\\'
-            TRAINING_FILES_SPECTOGRAMS = str(working_dir_path) + '\\ExtractedFeatures\\Spectogram\\'
-            SAVE_DIR_PATH = str(working_dir_path) + '\\ExtractedFeatues\\'
-            MODEL_DIR_PATH = str(working_dir_path) + '\\ImplementedModels\\'
+            TRAINING_FILES_SPECTOGRAMS = str(working_dir_path) + '\\TEMP\\Spectogram\\'
+            SAVE_RUNTIME_FEATURES = str(working_dir_path) + '\\TEMP\\'
+            MODEL_FEATURES_PATH = str(working_dir_path) + '\\ImplementedModels\\'
             MODEL_WEIGHTS_PATH = str(working_dir_path) + '\\ModelWeights\\'
+            MODEL_TRAINING_PLOTS = str(working_dir_path) + '\\TEMP\\Plots'
             TEST_FILES_PATH = str(working_dir_path) + '\\pass\\'
             RAVDESS_FILES_PATH = str(working_dir_path) + '\\Datasets\\Ravdess'
             CREMA_D_FILES_PATH = str(working_dir_path) + '\\Datasets\\Crema-D'
             SAVEE_FILES_PATH = str(working_dir_path) + '\\Datasets\\SAVEE'
-            DATATABLE_DF_PATH = str(working_dir_path) + '\\TEMP\\datatable.csv'
+            DATA_METADATA_DF_PATH = str(working_dir_path) + '\\TEMP\\datatable.csv'
+
         else:
             TRAINING_FILES_PATH = str(working_dir_path) + '/pass/'
-            TRAINING_FILES_SPECTOGRAMS = str(working_dir_path) + '/ExtractedFeatures/Spectogram'
-            SAVE_DIR_PATH = str(working_dir_path) + '/ExtractedFeatues/'
+            TRAINING_FILES_SPECTOGRAMS = str(working_dir_path) + '/TEMP/Spectogram'
             MODEL_DIR_PATH = str(working_dir_path) + '/ImplementedModels/'
             MODEL_WEIGHTS_PATH = str(working_dir_path) + '/ModelWeights'
+            MODEL_TRAINING_PLOTS = str(working_dir_path) + 'TEMP/Plots'
+            SAVE_RUNTIME_FEATURES= str(working_dir_path) + '/TEMP/'
             TEST_FILES_PATH = str(working_dir_path) + '/pass/'
             RAVDESS_FILES_PATH = str(working_dir_path) + '/Datasets/Ravdess'
             CREMA_D_FILES_PATH = str(working_dir_path) + '/Datasets/Crema-D'
             SAVEE_FILES_PATH = str(working_dir_path) + '/Datasets/SAVEE'
-            DATATABLE_DF_PATH = str(working_dir_path) + '/TEMP/datatable.csv'
+            DATA_METADATA_DF_PATH = str(working_dir_path) + '/TEMP/metadata_table.csv'
 
     class ModelTrainingConfig:
         use_pretrained_model = False
         use_split_random_state = False
         train_test_split_rate = 0.33
         random_state = 42 if use_split_random_state else None
+

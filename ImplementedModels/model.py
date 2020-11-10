@@ -9,7 +9,7 @@ from tensorflow.keras.layers import (LSTM, BatchNormalization, Concatenate,
 from tensorflow.keras.utils import plot_model
 from FeatureExtractor import *
 
-path = "r.wav"
+path = "../r.wav"
 
 data, sr = librosa.load(path, res_type='kaiser_fast',
                         duration=2.5, sr=44100, offset=0.5)
@@ -114,7 +114,7 @@ m_1 = model_1(number_of_outputs=14, n_mfcc=40)
 
 # extraction 1d data
 
-mfcc_1d = FeatureExtractor.extract("r.wav", 'mfcc')[0]
+mfcc_1d = FeatureExtractor.extract("../r.wav", 'mfcc')[0]
 mfcc_1d = np.expand_dims(mfcc_1d, 0)
 mfcc_1d = np.expand_dims(mfcc_1d, -1)
 

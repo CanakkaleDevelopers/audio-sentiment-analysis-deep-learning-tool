@@ -29,7 +29,7 @@ class FeatureExtractor:
         return y
 
     @staticmethod
-    def extract(file_path, features, augmentation=None, normalize=False):
+    def extract(file_path, features, normalize=False):
 
         """
         Ses dosyasının özniteliklerini döndürür.
@@ -65,7 +65,6 @@ class FeatureExtractor:
         warnings.filterwarnings("ignore")
 
         if len(features) == 0:
-        
             print("You need to extract at least one feature")
             return
 
@@ -74,16 +73,7 @@ class FeatureExtractor:
         data = (data[:, 0] if data.ndim > 1 else data.T)
 
         # eğer data augmentation varsa veriye manipüle et yoksa devam
-        if 'white_noise' in augmentation:
-            data = DataAugmentator.add_white_noise(data)
-        elif 'stretch' in augmentation:
-            data = DataAugmentator.stretch(data)
-        elif 'shift' in augmentation:
-            data = DataAugmentator.shift(data)
-        elif 'change_speed' in augmentation:
-            data = DataAugmentator.change_speed(data)
-        else:
-            pass
+        data = FeatureExtractor.add_augmentation_da_data_helper(data)
 
         # Get features
         sample_rate = conf.PreproccessConfig.sampling_rate
@@ -117,7 +107,7 @@ class FeatureExtractor:
         return extracted_features, lenght
 
     @staticmethod
-    def extractSpectogram(file_path, augmentation=None, save=False, show_in_console=False):
+    def extractSpectogram(file_path, save=False):
         """
         Mel spektogram görüntüsünü config dosyasındaki spectogram konumuna kaydeder,
         görüntüler insan tarafından değil  makine tarafından okunmak adına, x,y label isimleri vs barındırmaz.
@@ -138,17 +128,7 @@ class FeatureExtractor:
         warnings.filterwarnings("ignore")
         audio = FeatureExtractor.read_audio(file_path)
 
-        # eğer data augmentation varsa veriye manipüle et yoksa devam
-        if 'white_noise' in augmentation:
-            audio = DataAugmentator.add_white_noise(audio)
-        elif 'stretch' in augmentation:
-            audio = DataAugmentator.stretch(audio)
-        elif 'shift' in augmentation:
-            audio = DataAugmentator.shift(audio)
-        elif 'change_speed' in augmentation:
-            audio = DataAugmentator.change_speed(audio)
-        else:
-            pass
+        audio = FeatureExtractor.add_augmentation_da_data_helper(audio)
 
         spectrogram = librosa.feature.melspectrogram(audio,
                                                      sr=conf.PreproccessConfig.sampling_rate,
@@ -177,41 +157,71 @@ class FeatureExtractor:
         X_scaled = X_std * (max - min) + min
         return X_scaled
 
+
     @staticmethod
-    def extract_ravdess():
-        import os
+    def extract_from_metadata_table():
+        """
+        Bu fonksiyon çalışma zamanında oluşturulan TEMP/metadata_table.csv dosyasını baz alarak, orada yolu bulunan dosyaların,
+         özniteliklerini çıkartır, ve çalışma zamanında TEMP/Features.joblib dosyasını oluşturur.
 
-        root_path = conf.FilePathConfig.RAVDESS_FILES_PATH
+         Inputs: none
+         Dependencies: TEMP/metadata_table.csv && FeatureExtractor class methods && Config class
+        :return:
+        """
+        path_conf = conf.FilePathConfig
+        preprocess_conf = conf.PreproccessConfig
+        metadata_df = pd.read_csv(path_conf.DATA_METADATA_DF_PATH)
+        metadata_df = metadata_df.loc[:, ~metadata_df.columns.str.contains('^Unnamed')]
 
-        save_path = conf.FilePathConfig.SAVE_DIR_PATH
-        features_list = []
-        for subdir, dirs, files in os.walk(root_path):
-            for file in files:
-                try:
-                    features = \
-                        FeatureExtractor.extract(os.path.join(subdir, file), conf.PreproccessConfig.desired_features)[
-                            0]  # 0-> feature 1 -> lenght of arr
-                    emotion_code = int(file[7:8]) - 1  # 0-7 emotions
-                    arr = features, emotion_code
-                    features_list.append(arr)
-                    print(arr)
-                # dosya adı vs yanlıs olması veya islenememesi durumunda işlem durmamalı
-                except ValueError as err:
-                    print(err)
-                    continue
+        features_x_path = os.path.join(path_conf.SAVE_RUNTIME_FEATURES, 'featuresX')
+        features_y_path = os.path.join(path_conf.SAVE_RUNTIME_FEATURES, 'featuresY')
 
-        X, y = zip(*features_list)
+        _, feature_x_lenght = FeatureExtractor.extract('example_audio.ogg', preprocess_conf.desired_features)  # olusacak array shepini almak için
 
-        X, y = np.asarray(X), np.asarray(y)
+        features_x = np.empty(feature_x_lenght)
+        features_y = []
+        for index, row in metadata_df.iterrows():
+            print("Emotion:{} Dataset:{} {}/{}".format(row['labels'], row['source'], index, len(metadata_df)))
+            row_features, _ = FeatureExtractor.extract(row['path'], preprocess_conf.desired_features)
+            len(row_features)
+            features_x = np.vstack([features_x, row_features])
+            features_y = np.hstack([features_y, row['labels']])
 
-        print(X.shape, y.shape)
-
-        x_name, y_name = 'ravdessX.joblib', 'ravdessY.joblib'
-
-        import joblib  # disk dump
-
-        joblib.dump(X, os.path.join(save_path, x_name))
-        joblib.dump(y, os.path.join(save_path, y_name))
+        np.save(features_x_path, features_x)
+        np.save(features_y_path, features_y)
 
 
-""
+
+        print("Öznitelik çıkarım işlemi sonu")
+
+
+    @staticmethod
+    def add_augmentation_da_data_helper(data):
+        """
+        returns augmented data if
+        :param data: sound data
+        :param augmentation: augmentation list can be none
+        :return: augmented or non augmented data
+        """
+
+        from Config import Config
+        augmentation_config = Config.DataAugmentationConfig
+        augmentation = augmentation_config.augmentations
+        if augmentation_config.augment_data is not False:
+            # eğer data augmentation varsa veriye manipüle et yoksa devam
+            if 'white_noise' in augmentation:
+                audio = DataAugmentator.add_white_noise(data)
+            if 'stretch' in augmentation:
+                audio = DataAugmentator.stretch(data)
+            if 'shift' in augmentation:
+                audio = DataAugmentator.shift(data)
+            if 'change_speed' in augmentation:
+                audio = DataAugmentator.change_speed(data)
+            else:
+                pass
+        else:
+            pass
+
+        return data
+
+
