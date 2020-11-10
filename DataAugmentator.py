@@ -3,7 +3,6 @@ import random
 import itertools
 import librosa
 import matplotlib.pyplot as plt
-from FeatureExtractor import FeatureExtractor  as FE
 from Config import Config as conf
 class DataAugmentator:
     """Bu sınıf elimizdeki veri setinin boyutunu büyütmek amacı ile

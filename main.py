@@ -1,23 +1,24 @@
 def main():
     # deneme
     from FeatureExtractor import FeatureExtractor
-    # print(FeatureExtractor.extract("example_audio.ogg",['mfcc']))
-    # print(FeatureExtractor.extract_ravdess())
+    from DataMetaDataCreator import MetaDataCreator
 
-    #from ScratchModels import ScratchModels
+    # 1. Faz verisetlerinin meta çıkartımı TODO-> fonksiyon haline getir TODO-> daha çok veriseti ekle
+    MetaDataCreator.ravdess_to_datatable()
+    #MetaDataCreator.cremad_to_datatable()
+    #MetaDataCreator.savee_to_datatable()
 
-    #ScratchModels.train_model_1()
-    import numpy as np
-    import librosa
+    """
+    1.5 Faz  -> 1. fazın yarattığı metadata_table.csv dosyasından kullanıcının isteklerine göre istenmeyen verileri sil,
+    ve dataframei karıştır, tekrar aynı isimle ve aynı yere metadata_table.csv dosyasını kaydet.
+    """
 
-    data, sr = librosa.load("example_audio.ogg", sr=None)
-    from sklearn.preprocessing import normalize as sklearnnormalize
-    from librosa.util import normalize as libnormalize
+    """
+    2. Faz -> Öznitelikleri çıkart ve TEMP/FeaturesX.npy ve TEMP/FeaturesY.npy dosyaları oluşsun.
+    """
+    FeatureExtractor.extract_from_metadata_table()
 
-    ##print(FeatureExtractor.extractSpectogram.__doc__)
-    from DataAugmentator import DataAugmentator
-    #DataAugmentator.shift(FeatureExtractor.read_audio('example_audio.ogg'))
-    DataAugmentator.plot_time_series(DataAugmentator.stretch(FeatureExtractor.read_audio('example_audio.ogg')))
+
 
 
 

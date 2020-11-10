@@ -7,17 +7,17 @@ from pathlib import Path
 class MetaDataCreator:
 
     @staticmethod
-    def save_to_table(df):
-        save_path = conf.Config.FilePathConfig.DATATABLE_DF_PATH
+    def save_to_metadata_table(df):
+        save_path = conf.Config.FilePathConfig.DATA_METADATA_DF_PATH
 
         if os.path.exists(save_path):
-            print("Veriseti datatable.csv dosyasına eklendi")
+            print("Veriseti metadata_table.csv dosyasına eklendi")
             datatable = pd.read_csv(save_path)
             datatable = pd.concat([df, datatable], ignore_index=True)
             datatable = datatable.loc[:, ~datatable.columns.str.contains('^Unnamed')]
             datatable.to_csv(save_path)
         else:
-            print("Halihazirda olusmus datatable.csv dosyasının üzerine yazıldı")
+            print("Halihazirda olusmus metadata_table.csv dosyasının üzerine yazıldı")
             df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
             df.to_csv(save_path)
 
@@ -45,7 +45,7 @@ class MetaDataCreator:
                 else:
                     temp = "male"
                 gender.append(temp)
-                path.append(conf.Config.FilePathConfig.RAVDESS_FILES_PATH + i + '/' + f)
+                path.append(conf.Config.FilePathConfig.RAVDESS_FILES_PATH + '/' + i + '/' + f)
 
             RAV_df = pd.DataFrame(emotion)
             RAV_df = RAV_df.replace(
@@ -57,7 +57,7 @@ class MetaDataCreator:
             RAV_df = pd.concat([RAV_df, pd.DataFrame(path, columns=['path'])], axis=1)
             RAV_df = RAV_df.drop(['gender', 'emotion'], axis=1)
 
-        MetaDataCreator.save_to_table(RAV_df)
+        MetaDataCreator.save_to_metadata_table(RAV_df)
 
 
 
@@ -108,13 +108,13 @@ class MetaDataCreator:
                 emotion.append('female_neutral')
             else:
                 emotion.append('Unknown')
-            path.append(CREMA_D_F_PATH + i)
+            path.append(CREMA_D_F_PATH + '/' + i)
 
         crema_df = pd.DataFrame(emotion, columns=['labels'])
         crema_df['source'] = 'CREMA'
         crema_df = pd.concat([crema_df, pd.DataFrame(path, columns=['path'])], axis=1)
 
-        MetaDataCreator.save_to_table(crema_df)
+        MetaDataCreator.save_to_metadata_table(crema_df)
 
     @staticmethod
     def savee_to_datatable():
@@ -142,14 +142,12 @@ class MetaDataCreator:
                 emotion.append('male_surprise')
             else:
                 emotion.append('male_error')
-            path.append(SAVEE_PATH + i)
+            path.append(SAVEE_PATH + '/' + i)
 
         # Now check out the label count distribution
         savee_df = pd.DataFrame(emotion, columns=['labels'])
         savee_df['source'] = 'SAVEE'
         savee_df = pd.concat([savee_df, pd.DataFrame(path, columns=['path'])], axis=1)
 
-        MetaDataCreator.save_to_table(savee_df)
-
-
+        MetaDataCreator.save_to_metadata_table(savee_df)
 
