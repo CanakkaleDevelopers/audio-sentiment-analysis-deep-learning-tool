@@ -157,7 +157,6 @@ class FeatureExtractor:
         X_scaled = X_std * (max - min) + min
         return X_scaled
 
-
     @staticmethod
     def extract_from_metadata_table():
         """
@@ -173,27 +172,25 @@ class FeatureExtractor:
         metadata_df = pd.read_csv(path_conf.DATA_METADATA_DF_PATH)
         metadata_df = metadata_df.loc[:, ~metadata_df.columns.str.contains('^Unnamed')]
 
-        features_x_path = os.path.join(path_conf.SAVE_RUNTIME_FEATURES, 'featuresX')
-        features_y_path = os.path.join(path_conf.SAVE_RUNTIME_FEATURES, 'featuresY')
+        features_x_path = path_conf.SAVE_RUNTIME_FEATURES_X
+        features_y_path = path_conf.SAVE_RUNTIME_FEATURES_Y
 
-        _, feature_x_lenght = FeatureExtractor.extract('example_audio.ogg', preprocess_conf.desired_features)  # olusacak array shepini almak için
+        _, feature_x_lenght = FeatureExtractor.extract('example_audio.ogg',
+                                                       preprocess_conf.desired_features)  # olusacak array shepini almak için
 
         features_x = np.empty(feature_x_lenght)
         features_y = []
         for index, row in metadata_df.iterrows():
             print("Emotion:{} Dataset:{} {}/{}".format(row['labels'], row['source'], index, len(metadata_df)))
             row_features, _ = FeatureExtractor.extract(row['path'], preprocess_conf.desired_features)
-            len(row_features)
             features_x = np.vstack([features_x, row_features])
             features_y = np.hstack([features_y, row['labels']])
 
+        features_x = features_x[1:]  # trim first np.empty(40)
         np.save(features_x_path, features_x)
         np.save(features_y_path, features_y)
 
-
-
         print("Öznitelik çıkarım işlemi sonu")
-
 
     @staticmethod
     def add_augmentation_da_data_helper(data):
@@ -223,5 +220,3 @@ class FeatureExtractor:
             pass
 
         return data
-
-
