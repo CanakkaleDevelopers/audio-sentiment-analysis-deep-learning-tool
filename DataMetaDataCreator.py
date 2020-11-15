@@ -21,13 +21,12 @@ class MetaDataCreator:
             df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
             df.to_csv(save_path)
 
-
     """Data Explorerin amacı farklı veritabanlarından istediğimiz kadar veriyi özellikleri ve dosya yolları ile
     bir dataframe'e dökmek ve verisetleri arasındaki uyuşmazlık ve farklıları ortadan kaldırmaktır."""
 
     @staticmethod
     def ravdess_to_datatable():
-
+        print("RAVDESS")
         dir_list = os.listdir(conf.Config.FilePathConfig.RAVDESS_FILES_PATH)
         dir_list.sort()
 
@@ -59,10 +58,9 @@ class MetaDataCreator:
 
         MetaDataCreator.save_to_metadata_table(RAV_df)
 
-
-
     @staticmethod
     def cremad_to_datatable():
+        print("Crema-D")
         CREMA_D_F_PATH = conf.Config.FilePathConfig.CREMA_D_FILES_PATH
         dir_list = os.listdir(CREMA_D_F_PATH)
         dir_list.sort()
@@ -108,7 +106,7 @@ class MetaDataCreator:
                 emotion.append('female_neutral')
             else:
                 emotion.append('Unknown')
-            path.append(CREMA_D_F_PATH + '/' + i)
+            path.append(os.path.join(CREMA_D_F_PATH, i))
 
         crema_df = pd.DataFrame(emotion, columns=['labels'])
         crema_df['source'] = 'CREMA'
@@ -118,6 +116,7 @@ class MetaDataCreator:
 
     @staticmethod
     def savee_to_datatable():
+        print("SAVEE")
         # Get the data location for SAVEE
         SAVEE_PATH = conf.Config.FilePathConfig.SAVEE_FILES_PATH
         dir_list = os.listdir(SAVEE_PATH)
@@ -142,7 +141,7 @@ class MetaDataCreator:
                 emotion.append('male_surprise')
             else:
                 emotion.append('male_error')
-            path.append(SAVEE_PATH + '/' + i)
+            path.append(os.path.join(SAVEE_PATH, i))
 
         # Now check out the label count distribution
         savee_df = pd.DataFrame(emotion, columns=['labels'])
@@ -150,4 +149,53 @@ class MetaDataCreator:
         savee_df = pd.concat([savee_df, pd.DataFrame(path, columns=['path'])], axis=1)
 
         MetaDataCreator.save_to_metadata_table(savee_df)
+
+    @staticmethod
+    def emodb_to_datatable():
+        print("EMODB")
+        EMODB_PATH = conf.Config.FilePathConfig.EMODB_FILES_PATH
+        emotion = []
+        path = []
+
+        for root, dirs, files in os.walk(EMODB_PATH):
+            for name in files:
+                if name[0:2] in '0310111215':  # o zaman bu bir erkek
+                    if name[5] == 'W':  # Ärger (Wut) -> Angry
+                        emotion.append('male_angry')
+                    elif name[5] == 'L':  # Langeweile -> Boredom
+                        emotion.append('male_bored')
+                    elif name[5] == 'E':  # Ekel -> Disgusted
+                        emotion.append('male_disgust')
+                    elif name[5] == 'A':  # Angst -> Angry
+                        emotion.append('male_fear')
+                    elif name[5] == 'F':  # Freude -> Happiness
+                        emotion.append('male_happy')
+                    elif name[5] == 'T':  # Trauer -> Sadness
+                        emotion.append('male_sad')
+                    else:
+                        emotion.append('unknown')
+                else:
+                    if name[5] == 'W':  # Ärger (Wut) -> Angry
+                        emotion.append('female_angry')
+                    elif name[5] == 'L':  # Langeweile -> Boredom
+                        emotion.append('female_bored')
+                    elif name[5] == 'E':  # Ekel -> Disgusted
+                        emotion.append('female_disgust')
+                    elif name[5] == 'A':  # Angst -> Angry
+                        emotion.append('female_fear')
+                    elif name[5] == 'F':  # Freude -> Happiness
+                        emotion.append('female_happy')
+                    elif name[5] == 'T':  # Trauer -> Sadness
+                        emotion.append('female_sad')
+                    else:
+                        emotion.append('unknown')
+
+                path.append(os.path.join(EMODB_PATH, name))
+
+        emodb_df = pd.DataFrame(emotion, columns=['labels'])
+        emodb_df['source'] = 'EMODB'
+        emodb_df = pd.concat([emodb_df, pd.DataFrame(path, columns=['path'])], axis=1)
+
+        MetaDataCreator.save_to_metadata_table(emodb_df)
+
 

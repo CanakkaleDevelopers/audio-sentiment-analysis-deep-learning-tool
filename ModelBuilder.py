@@ -14,6 +14,9 @@ class ModelBuilder:
         Outputs:
         Keras model (model)
 
+        :return
+        Keras model
+
         Saves:
         Keras model (h5py)
         Keras model (JSON)

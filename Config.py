@@ -1,9 +1,11 @@
 import os
 import json
+
+
 class Config:
     class PreproccessConfig:
         sampling_rate = 44100
-        duration = 2
+        duration = 4
         hop_length = 347 * duration  # to make time steps 128
         fmin = 20
         fmax = sampling_rate // 2
@@ -24,12 +26,17 @@ class Config:
 
     class DataAugmentationConfig:
         augment_data = False
-        augmentations = ['addWhiteNoise','Shift']
+        augmentations = ['addWhiteNoise', 'Shift']
         shift_rate = 1600
         strectch_rate = 1
         speed_change = 1
         pitch_pm = 4
         bins_per_octave = 24
+
+    class DataExplorerConfig:
+        defined_datasets = ['Crema-D', 'emoDB', 'Ravdess', 'SAVEE'] # sisteme tanımlı verisetleri
+        selected_datasets = ['Ravdess'] # kullanıcının kullanacağım dediği verisetleri
+        datasets_path = 'Datasets'
 
     class FilePathConfig:
         import sys
@@ -50,6 +57,7 @@ class Config:
             RAVDESS_FILES_PATH = str(working_dir_path) + '\\Datasets\\Ravdess'
             CREMA_D_FILES_PATH = str(working_dir_path) + '\\Datasets\\Crema-D'
             SAVEE_FILES_PATH = str(working_dir_path) + '\\Datasets\\SAVEE'
+            EMODB_FILES_PATH = str(working_dir_path) + '\\Datasets\\emoDB'
             DATA_METADATA_DF_PATH = str(working_dir_path) + '\\TEMP\\datatable.csv'
 
         else:
@@ -58,12 +66,13 @@ class Config:
             MODEL_DIR_PATH = str(working_dir_path) + '/ImplementedModels/'
             MODEL_WEIGHTS_PATH = str(working_dir_path) + '/ModelWeights'
             MODEL_TRAINING_PLOTS = str(working_dir_path) + 'TEMP/Plots'
-            SAVE_RUNTIME_FEATURES_X= str(working_dir_path) + '/TEMP/featuresX.npy'
+            SAVE_RUNTIME_FEATURES_X = str(working_dir_path) + '/TEMP/featuresX.npy'
             SAVE_RUNTIME_FEATURES_Y = str(working_dir_path) + '/TEMP/featuresY.npy'
             TEST_FILES_PATH = str(working_dir_path) + '/pass/'
             RAVDESS_FILES_PATH = str(working_dir_path) + '/Datasets/Ravdess'
             CREMA_D_FILES_PATH = str(working_dir_path) + '/Datasets/Crema-D'
             SAVEE_FILES_PATH = str(working_dir_path) + '/Datasets/SAVEE'
+            EMODB_FILES_PATH = str(working_dir_path) + '/Datasets/emoDB'
             DATA_METADATA_DF_PATH = str(working_dir_path) + '/TEMP/metadata_table.csv'
 
     class ModelTrainingConfig:
@@ -71,4 +80,3 @@ class Config:
         use_split_random_state = False
         train_test_split_rate = 0.33
         random_state = 42 if use_split_random_state else None
-
