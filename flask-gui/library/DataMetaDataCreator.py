@@ -1,6 +1,9 @@
 import pandas as pd
 import Config as conf
 import os
+
+from app import db
+from database.models import DatasetCatalog, DatasetMeta
 from pathlib import Path
 
 
@@ -34,7 +37,10 @@ class MetaDataCreator:
         emotion = []
         gender = []
         path = []
+
+
         for i in dir_list:
+
             fname = os.listdir(os.path.join(conf.Config.FilePathConfig.RAVDESS_FILES_PATH, i))
             for f in fname:
                 part = f.split('.')[0].split('-')
