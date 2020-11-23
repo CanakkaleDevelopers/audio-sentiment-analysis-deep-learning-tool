@@ -1,4 +1,3 @@
-from Config import Config
 import os
 import sys
 
@@ -8,27 +7,27 @@ class DatasetExplorer:
     Yeri geldiğinde bir adet nesne oluşturulmalıdır.
     Lütfen bu sınıftan oluşturulacak nesneye dışarıdan müdahalede bulunmayın.
     """
-    dataset_explorer_config = Config.DataExplorerConfig
     local_datasets = []
-    to_be_used_datasets = []
     download_queue = []
     install_queue = []
 
-    def __init__(self):
-        self.to_be_used_datasets = self.dataset_explorer_config.selected_datasets
-        self.scan()
-        self.download_datasets()
+    def __init__(self, demanded_datasets, path_dict):
+        self.to_be_used_datasets = demanded_datasets
+        self.path_dict = path_dict
 
     def scan(self):
-        """constructor method."""
+        """
+        Scans the Datasets folder
+        :return:
+        """
         try:
             for dataset_folder in os.scandir(
-                    self.dataset_explorer_config.datasets_path):  # phase one -> scan local datasets dir
+                    self.path_dict['DATASETS_PATH']):  # phase one -> scan local datasets dir
                 if not dataset_folder.name.startswith('.') and dataset_folder.is_dir():
                     self.local_datasets.append(dataset_folder.name)
                     print("Local dataset found : ", dataset_folder.name, 'Folder size',
                           self.get_tree_size(
-                              os.path.join(self.dataset_explorer_config.datasets_path, dataset_folder.name)) / 10 ** 6,
+                              os.path.join(self.path_dict['DATASETS_PATH'], dataset_folder.name)) / 10 ** 6,
                           'MB')
             for dataset in self.to_be_used_datasets:
                 if dataset not in self.local_datasets:

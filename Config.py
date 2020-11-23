@@ -13,7 +13,7 @@ class Config:
         n_mfcc = 40
         n_fft = n_mels * 20
         samples = sampling_rate * duration
-        desired_features = ['mfcc']
+        desired_features = ['mfcc', 'chroma', 'mel', 'tonnetz', 'mfcc_delta']
         is_Spectogram_selected = False
         spectogram_file_extension = 'png'
         isNormalized = False
@@ -26,7 +26,7 @@ class Config:
 
     class DataAugmentationConfig:
         augment_data = False
-        augmentations = ['addWhiteNoise', 'Shift']
+        augmentations = ['white_noise', 'stretch', 'shift', 'change_speed']
         shift_rate = 1600
         strectch_rate = 1
         speed_change = 1
@@ -34,8 +34,8 @@ class Config:
         bins_per_octave = 24
 
     class DataExplorerConfig:
-        defined_datasets = ['Crema-D', 'emoDB', 'Ravdess', 'SAVEE'] # sisteme tanımlı verisetleri
-        selected_datasets = ['Ravdess'] # kullanıcının kullanacağım dediği verisetleri
+        defined_datasets = ['Crema-D', 'emoDB', 'Ravdess', 'SAVEE']  # sisteme tanımlı verisetleri
+        selected_datasets = ['Ravdess']  # kullanıcının kullanacağım dediği verisetleri
         datasets_path = 'Datasets'
 
     class FilePathConfig:

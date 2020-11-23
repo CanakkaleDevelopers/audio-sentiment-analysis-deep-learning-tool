@@ -10,26 +10,33 @@ from DataAugmentator import DataAugmentator
 
 
 class FeatureExtractor:
+    def __init__(self, feature_extraction_dict):
+        self.sampling_rate = feature_extraction_dict['sampling_rate']
+        self.samples = feature_extraction_dict['samples']
+        self.n_mfcc = feature_extraction_dict['n_mfcc']
+        self.features = feature_extraction_dict['features']  # çıkartılacak featureler, liste olmalı
+        self.augmentations = feature_extraction_dict['augmentations']
+
+
+
 
     # todo -> add normalize = True
-    @staticmethod
-    def read_audio(pathname, trim_long_data=False):
-        y, sr = librosa.load(pathname, sr=conf.PreproccessConfig.sampling_rate)
+    def read_audio(self, pathname, trim_long_data=False):
+        y, sr = librosa.load(pathname, sr=self.sampling_rate)
 
         if 0 < len(y):
             y, _ = librosa.effects.trim(y)
 
-        if len(y) > conf.PreproccessConfig.samples:
+        if len(y) > self.samples:
             if trim_long_data:
-                y = y[0:0 + conf.PreproccessConfig.samples]
+                y = y[0:0 + self.samples]
         else:
-            padding = conf.PreproccessConfig.samples - len(y)
+            padding = self.samples - len(y)
             offset = padding // 2
-            y = np.pad(y, (offset, conf.PreproccessConfig.samples - len(y) - offset), 'constant')
+            y = np.pad(y, (offset, self.samples - len(y) - offset), 'constant')
         return y
 
-    @staticmethod
-    def extract(file_path, features, normalize=False):
+    def extract(self, file_path, make_augmentations=False):
 
         """
         Ses dosyasının özniteliklerini döndürür.
@@ -38,9 +45,7 @@ class FeatureExtractor:
 
         file_path (string) : dosyanın yolu
 
-        features (list) : [mfcc,chroma,zcr,mel,contrast,tonnetz] len(features) => 1 olmalı
-
-        augmentation (list) : ['white_noise' , 'stretch','shift'] , default : None
+        make_augmentations : eğer true ise augmented data özellikleri döndürür
 
 
         mfccs (numpy.array) : mel Mel frekans ölçeği, insan kulağının ses frekanslarındaki değişimi algılayışını gösteren bir ölçektir.
@@ -64,32 +69,32 @@ class FeatureExtractor:
 
         warnings.filterwarnings("ignore")
 
-        if len(features) == 0:
+        if len(self.features) == 0:
             print("You need to extract at least one feature")
             return
 
-        data = FeatureExtractor.read_audio(file_path)
-        # data , _ = librosa.load(file_path,sr=conf.PreproccessConfig.sampling_rate)
+        data = self.read_audio(file_path)
         data = (data[:, 0] if data.ndim > 1 else data.T)
 
         # eğer data augmentation varsa veriye manipüle et yoksa devam
-        data = FeatureExtractor.add_augmentation_da_data_helper(data)
+        if make_augmentations:
+            data = self.augment_data(data)
 
         # Get features
-        sample_rate = conf.PreproccessConfig.sampling_rate
+        sample_rate = self.sampling_rate
         stft = np.abs(librosa.stft(data))
-        if "mfcc" in features: mfcc = np.mean(
-            librosa.feature.mfcc(y=data, sr=sample_rate, n_mfcc=conf.PreproccessConfig.n_mfcc).T,
+        if "mfcc" in self.features: mfcc = np.mean(
+            librosa.feature.mfcc(y=data, sr=sample_rate, n_mfcc=self.n_mfcc).T,
             axis=0)  # 40 values
-        if "chroma" in features: chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
-        if "mel" in features: mel = np.mean(librosa.feature.melspectrogram(data, sr=sample_rate).T, axis=0)
-        if "contrast" in features: contrast = np.mean(librosa.feature.spectral_contrast(S=stft, sr=sample_rate).T,
-                                                      axis=0)
-        if "tonnetz" in features: tonnetz = np.mean(
+        if "chroma" in self.features: chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
+        if "mel" in self.features: mel = np.mean(librosa.feature.melspectrogram(data, sr=sample_rate).T, axis=0)
+        if "contrast" in self.features: contrast = np.mean(librosa.feature.spectral_contrast(S=stft, sr=sample_rate).T,
+                                                           axis=0)
+        if "tonnetz" in self.features: tonnetz = np.mean(
             librosa.feature.tonnetz(y=librosa.effects.harmonic(data), sr=sample_rate).T,  # tonal centroid features
             axis=0)
 
-        if "mfcc_delta" in features: mfcc_delta = np.mean(
+        if "mfcc_delta" in self.features: mfcc_delta = np.mean(
             librosa.feature.delta(librosa.feature.mfcc(y=data, sr=sample_rate)))
 
         # öznitelik dizimizin uzunlugunu hesaplayalım
@@ -128,7 +133,7 @@ class FeatureExtractor:
         warnings.filterwarnings("ignore")
         audio = FeatureExtractor.read_audio(file_path)
 
-        audio = FeatureExtractor.add_augmentation_da_data_helper(audio)
+        audio = FeatureExtractor.augment_data(audio)
 
         spectrogram = librosa.feature.melspectrogram(audio,
                                                      sr=conf.PreproccessConfig.sampling_rate,
@@ -192,30 +197,24 @@ class FeatureExtractor:
 
         print("Öznitelik çıkarım işlemi sonu")
 
-    @staticmethod
-    def add_augmentation_da_data_helper(data):
+    def augment_data(self, data):
         """
         returns augmented data if
         :param data: sound data
-        :param augmentation: augmentation list can be none
-        :return: augmented or non augmented data
+
+        :return: return augmented
         """
 
-        from Config import Config
-        augmentation_config = Config.DataAugmentationConfig
-        augmentation = augmentation_config.augmentations
-        if augmentation_config.augment_data is not False:
-            # eğer data augmentation varsa veriye manipüle et yoksa devam
-            if 'white_noise' in augmentation:
-                audio = DataAugmentator.add_white_noise(data)
-            if 'stretch' in augmentation:
-                audio = DataAugmentator.stretch(data)
-            if 'shift' in augmentation:
-                audio = DataAugmentator.shift(data)
-            if 'change_speed' in augmentation:
-                audio = DataAugmentator.change_speed(data)
-            else:
-                pass
+        augmentation = self.augmentations
+
+        if 'white_noise' in augmentation:
+            audio = DataAugmentator.add_white_noise(data)
+        if 'stretch' in augmentation:
+            audio = DataAugmentator.stretch(data)
+        if 'shift' in augmentation:
+            audio = DataAugmentator.shift(data)
+        if 'change_speed' in augmentation:
+            audio = DataAugmentator.change_speed(data)
         else:
             pass
 
