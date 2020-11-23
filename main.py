@@ -70,6 +70,12 @@ def main():
         np.save(save_features_X, features_x)
         np.save(save_features_Y, features_y)
 
+        """
+        if(save_this_features_forever):
+            TODO-> eğer kullanıcı bu featureleri sonra da kullanmak isterse kaydedebilmeli
+            çünkü işlem çok uzun
+        """
+
 
 if __name__ == "__main__":
     main()
