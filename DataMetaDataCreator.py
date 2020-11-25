@@ -1,14 +1,18 @@
 import pandas as pd
-import Config as conf
 import os
 from pathlib import Path
 
 
 class MetaDataCreator:
+    def __init__(self, path_dict):
+        self.emoDB_path = path_dict['emoDB']
+        self.ravdess_path = path_dict['Ravdess']
+        self.savee_path = path_dict['SAVEE']
+        self.crema_d = path_dict['Crema-D']
+        self.data_metadata_file_path = path_dict['temp_folder']
 
-    @staticmethod
-    def save_to_metadata_table(df):
-        save_path = conf.Config.FilePathConfig.DATA_METADATA_DF_PATH
+    def save_to_metadata_table(self, df):
+        save_path = os.path.join(self.data_metadata_file_path, 'metadata_table')
 
         if os.path.exists(save_path):
             print("Veriseti metadata_table.csv dosyasına eklendi")
@@ -24,17 +28,16 @@ class MetaDataCreator:
     """Data Explorerin amacı farklı veritabanlarından istediğimiz kadar veriyi özellikleri ve dosya yolları ile
     bir dataframe'e dökmek ve verisetleri arasındaki uyuşmazlık ve farklıları ortadan kaldırmaktır."""
 
-    @staticmethod
-    def ravdess_to_datatable():
+    def ravdess_to_datatable(self):
         print("RAVDESS")
-        dir_list = os.listdir(conf.Config.FilePathConfig.RAVDESS_FILES_PATH)
+        dir_list = self.ravdess_path
         dir_list.sort()
 
         emotion = []
         gender = []
         path = []
         for i in dir_list:
-            fname = os.listdir(os.path.join(conf.Config.FilePathConfig.RAVDESS_FILES_PATH, i))
+            fname = os.listdir(os.path.join(dir_list, i))
             for f in fname:
                 part = f.split('.')[0].split('-')
                 emotion.append(int(part[2]))
@@ -44,7 +47,7 @@ class MetaDataCreator:
                 else:
                     temp = "male"
                 gender.append(temp)
-                path.append(conf.Config.FilePathConfig.RAVDESS_FILES_PATH + '/' + i + '/' + f)
+                path.append(self.ravdess_path + '/' + i + '/' + f)
 
             RAV_df = pd.DataFrame(emotion)
             RAV_df = RAV_df.replace(
@@ -56,12 +59,11 @@ class MetaDataCreator:
             RAV_df = pd.concat([RAV_df, pd.DataFrame(path, columns=['path'])], axis=1)
             RAV_df = RAV_df.drop(['gender', 'emotion'], axis=1)
 
-        MetaDataCreator.save_to_metadata_table(RAV_df)
+        self.save_to_metadata_table(RAV_df)
 
-    @staticmethod
-    def cremad_to_datatable():
+    def cremad_to_datatable(self):
         print("Crema-D")
-        CREMA_D_F_PATH = conf.Config.FilePathConfig.CREMA_D_FILES_PATH
+        CREMA_D_F_PATH = self.crema_d
         dir_list = os.listdir(CREMA_D_F_PATH)
         dir_list.sort()
         print(dir_list[0:10])
@@ -112,13 +114,12 @@ class MetaDataCreator:
         crema_df['source'] = 'CREMA'
         crema_df = pd.concat([crema_df, pd.DataFrame(path, columns=['path'])], axis=1)
 
-        MetaDataCreator.save_to_metadata_table(crema_df)
+        self.save_to_metadata_table(crema_df)
 
-    @staticmethod
-    def savee_to_datatable():
+    def savee_to_datatable(self):
         print("SAVEE")
         # Get the data location for SAVEE
-        SAVEE_PATH = conf.Config.FilePathConfig.SAVEE_FILES_PATH
+        SAVEE_PATH = self.savee_path
         dir_list = os.listdir(SAVEE_PATH)
 
         # parse the filename to get the emotions
@@ -148,12 +149,11 @@ class MetaDataCreator:
         savee_df['source'] = 'SAVEE'
         savee_df = pd.concat([savee_df, pd.DataFrame(path, columns=['path'])], axis=1)
 
-        MetaDataCreator.save_to_metadata_table(savee_df)
+        self.save_to_metadata_table(savee_df)
 
-    @staticmethod
-    def emodb_to_datatable():
+    def emodb_to_datatable(self):
         print("EMODB")
-        EMODB_PATH = conf.Config.FilePathConfig.EMODB_FILES_PATH
+        EMODB_PATH = self.emoDB_path
         emotion = []
         path = []
 
@@ -196,6 +196,27 @@ class MetaDataCreator:
         emodb_df['source'] = 'EMODB'
         emodb_df = pd.concat([emodb_df, pd.DataFrame(path, columns=['path'])], axis=1)
 
-        MetaDataCreator.save_to_metadata_table(emodb_df)
+        self.save_to_metadata_table(emodb_df)
 
+    def create_csv(self, demanded_datasets):
 
+        if 'Crema-D' in demanded_datasets:
+            try:
+                self.cremad_to_datatable()
+            except:
+                print("CremaD düzgün çıkartılamamış olabilir.")
+        if 'emoDB' in demanded_datasets:
+            try:
+                self.emodb_to_datatable()
+            except:
+                print("emoDB düzgün çıkartılamamış olabilir.")
+        if 'Ravdess' in demanded_datasets:
+            try:
+                self.ravdess_to_datatable()
+            except:
+                print('Ravdess düzgün çıkartılamamış olabilir.')
+        if 'SAVEE' in demanded_datasets:
+            try:
+                self.save_to_metadata_table()
+            except:
+                print('SAVEE düzgün çıkartılamamış olabilir.')
