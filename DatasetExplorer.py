@@ -59,7 +59,7 @@ class DatasetExplorer:
 
 
             dataset_download_path = os.path.join(downloads_path, dataset_zip_name)
-            download_url = 'https://sentiment-analysis-deep-learning-tool-storage.s3.us-east-2.amazonaws.com/{}'.format(
+            download_url = 'https://audio-sentiment-analysis-tool-cloud-storage.s3.eu-central-1.amazonaws.com/{}'.format(
                 dataset_zip_name)
             print('{} adresinden indirme işlemi gerçekleşiyor..'.format(download_url))
             urllib.request.urlretrieve(download_url, dataset_download_path)
