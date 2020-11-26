@@ -8,7 +8,7 @@ def main():
     from ModelTrainer import ModelTrainer
 
     explore_datasets = False
-    make_feature_extraction = True
+    make_feature_extraction = False
     create_meta_csv = False
     select_pretrained_model = False
     build_your_model = False
@@ -43,40 +43,33 @@ def main():
     """
     if make_feature_extraction:
         # initialization of FeatureExtractor class block
-        feature_extraction_dict = {'sampling_rate': 44100, 'samples': 44100 * 4, 'n_mfcc': 40,
+        feature_extraction_dict = {'sampling_rate': 44100, 'duration': 4, 'trim_long_data': False, 'n_mfcc': 40,
                                    'features': ['mfcc'],
                                    'augmentations': ['white_noise', 'stretch', 'shift', 'change_speed']}
         f = FeatureExtractor(feature_extraction_dict)  # feature_extraction_dict {} yolla,
 
-        f.extract_with_database() # bu fonksiyonun içerisine query yerleştirilecek
+        f.extract_with_database()  # bu fonksiyonun içerisine query yerleştirilecek
 
     if build_your_model:
         model_builder = NewModelBuilder()
 
         input_layer = {'name': 'input_layer', 'input_shape': (40, 1), 'batch_size': (40)}
-        conv_1d = {'name': 'conv_1d', 'filters': 32, 'kernel_size': 3, 'padding': 'same', 'activation':'relu'}
+        conv_1d = {'name': 'conv_1d', 'filters': 32, 'kernel_size': 3, 'padding': 'same', 'activation': 'relu'}
         dropout = {'name': 'dropout', 'rate': 0.5}
         dense = {'name': 'dense', 'units': 32, 'activation': 'relu'}
         batch_normalization = {'name': 'batch_normalization'}
-        flatten = {'name':'flatten'}
+        flatten = {'name': 'flatten'}
         compile_config = {'optimizer': 'rmsprop', 'loss': 'binary_crossentropy', 'metrics': ['accuracy']}
 
-        my_layers = [input_layer, conv_1d, dropout, dense, batch_normalization,flatten, dense]
+        my_layers = [input_layer, conv_1d, dropout, dense, batch_normalization, flatten, dense]
 
         uncompiled_model = model_builder.get_uncompiled_model(my_layers)
         compiled_model = model_builder.get_compiled_model(compile_config)
 
     if train_your_model:
-        model_train_config = {'save_model':True, 'split_rate':0.66}
-        model_trainer = ModelTrainer(model_train_config,path_dict)
+        model_train_config = {'save_model': True, 'split_rate': 0.66}
+        model_trainer = ModelTrainer(model_train_config, path_dict)
         model_trainer.train_with_temp_features()
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":

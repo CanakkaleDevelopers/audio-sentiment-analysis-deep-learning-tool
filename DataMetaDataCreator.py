@@ -83,34 +83,47 @@ class MetaDataCreator:
                 temp = 'male'
             gender.append(temp)
             if part[2] == 'SAD' and temp == 'male':
-                emotion.append('male_sad')
+                emotion.append('sad')
+                gender.append('male')
             elif part[2] == 'ANG' and temp == 'male':
-                emotion.append('male_angry')
+                emotion.append('angry')
+                gender.append('male')
             elif part[2] == 'DIS' and temp == 'male':
-                emotion.append('male_disgust')
+                emotion.append('disgust')
+                gender.append('male')
             elif part[2] == 'FEA' and temp == 'male':
-                emotion.append('male_fear')
+                emotion.append('fear')
+                gender.append('male')
             elif part[2] == 'HAP' and temp == 'male':
-                emotion.append('male_happy')
+                emotion.append('happy')
+                gender.append('male')
             elif part[2] == 'NEU' and temp == 'male':
-                emotion.append('male_neutral')
+                emotion.append('neutral')
+                gender.append('male')
             elif part[2] == 'SAD' and temp == 'female':
-                emotion.append('female_sad')
+                emotion.append('sad')
+                gender.append('female')
             elif part[2] == 'ANG' and temp == 'female':
-                emotion.append('female_angry')
+                emotion.append('angry')
+                gender.append('female')
             elif part[2] == 'DIS' and temp == 'female':
-                emotion.append('female_disgust')
+                emotion.append('disgust')
+                gender.append('female')
             elif part[2] == 'FEA' and temp == 'female':
-                emotion.append('female_fear')
+                emotion.append('fear')
+                gender.append('female')
             elif part[2] == 'HAP' and temp == 'female':
-                emotion.append('female_happy')
+                emotion.append('happy')
+                gender.append('female')
             elif part[2] == 'NEU' and temp == 'female':
-                emotion.append('female_neutral')
+                emotion.append('neutral')
+                gender.append('female')
             else:
                 emotion.append('Unknown')
             path.append(os.path.join(CREMA_D_F_PATH, i))
 
-        crema_df = pd.DataFrame(emotion, columns=['labels'])
+        crema_df = pd.DataFrame(emotion, columns=['emotion'])
+        crema_df = pd.concat(crema_df,pd.DataFrame(gender,columns=['gender']))
         crema_df['source'] = 'CREMA'
         crema_df = pd.concat([crema_df, pd.DataFrame(path, columns=['path'])], axis=1)
 

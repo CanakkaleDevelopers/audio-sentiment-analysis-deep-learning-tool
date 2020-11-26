@@ -12,23 +12,30 @@ from DataAugmentator import DataAugmentator
 class FeatureExtractor:
     def __init__(self, feature_extraction_dict):
         self.sampling_rate = feature_extraction_dict['sampling_rate']
-        self.samples = feature_extraction_dict['samples']
+        self.duration = feature_extraction_dict['duration']
+        self.samples = feature_extraction_dict['duration'] * feature_extraction_dict['samples']
         self.n_mfcc = feature_extraction_dict['n_mfcc']
         self.features = feature_extraction_dict['features']  # çıkartılacak featureler, liste olmalı
         self.augmentations = feature_extraction_dict['augmentations']
-
-
+        self.trim_long_data = feature_extraction_dict['trim_long_data']
 
 
     # todo -> add normalize = True
-    def read_audio(self, pathname, trim_long_data=False):
+    def read_audio(self, pathname):
+        """
+        sesi yükler ve sesin dosyasındaki sessiz bölgeleri atar,
+        ardından ses kısaysa doldurur,ses uzunsa belirtilen süreden
+        uzun kısmını keser.
+        :param pathname:
+        :return:
+        """
         y, sr = librosa.load(pathname, sr=self.sampling_rate)
 
         if 0 < len(y):
             y, _ = librosa.effects.trim(y)
 
         if len(y) > self.samples:
-            if trim_long_data:
+            if self.trim_long_data:
                 y = y[0:0 + self.samples]
         else:
             padding = self.samples - len(y)
