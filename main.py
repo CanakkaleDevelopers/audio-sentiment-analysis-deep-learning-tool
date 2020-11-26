@@ -8,7 +8,7 @@ def main():
     from ModelTrainer import ModelTrainer
 
     explore_datasets = False
-    make_feature_extraction = False
+    make_feature_extraction = True
     create_meta_csv = False
     select_pretrained_model = False
     build_your_model = False
@@ -46,7 +46,9 @@ def main():
         feature_extraction_dict = {'sampling_rate': 44100, 'duration': 4, 'trim_long_data': False, 'n_mfcc': 40,
                                    'features': ['mfcc'],
                                    'augmentations': ['white_noise', 'stretch', 'shift', 'change_speed']}
-        f = FeatureExtractor(feature_extraction_dict)  # feature_extraction_dict {} yolla,
+        data_augmentation_dict = {'shift_rate': 1600, 'stretch_rate': 1, 'speed_change': 1,
+         'pitch_pm': 24, 'bins_per_octave': 24}
+        f = FeatureExtractor(feature_extraction_dict,data_augmentation_dict)  # feature_extraction_dict {} yolla,
 
         f.extract_with_database()  # bu fonksiyonun içerisine query yerleştirilecek
 

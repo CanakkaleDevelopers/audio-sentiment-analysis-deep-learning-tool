@@ -10,10 +10,11 @@ from DataAugmentator import DataAugmentator
 
 
 class FeatureExtractor:
-    def __init__(self, feature_extraction_dict):
+    def __init__(self, feature_extraction_dict,data_augmentation_dict):
+        self.data_augmentator = DataAugmentator(data_augmentation_dict)
         self.sampling_rate = feature_extraction_dict['sampling_rate']
         self.duration = feature_extraction_dict['duration']
-        self.samples = feature_extraction_dict['duration'] * feature_extraction_dict['samples']
+        self.samples = feature_extraction_dict['duration'] * feature_extraction_dict['sampling_rate']
         self.n_mfcc = feature_extraction_dict['n_mfcc']
         self.features = feature_extraction_dict['features']  # çıkartılacak featureler, liste olmalı
         self.augmentations = feature_extraction_dict['augmentations']
@@ -118,50 +119,6 @@ class FeatureExtractor:
 
         return extracted_features, lenght
 
-    @staticmethod
-    def extractSpectogram(file_path, save=False):
-        """
-        Mel spektogram görüntüsünü config dosyasındaki spectogram konumuna kaydeder,
-        görüntüler insan tarafından değil  makine tarafından okunmak adına, x,y label isimleri vs barındırmaz.
-        dosyanın adı audio dosyasının kendi adı ve uzantısı 'png' dir.
-
-        Parameters
-
-        file_path (str) : dosyanın yolu
-        augmentation (list) : ['white_noise' , 'stretch','shift'] , default : None
-
-        Returns & Saves
-
-        no return -void-
-
-        spectogram file (file) : filename.desired_image_extension
-
-        """
-        warnings.filterwarnings("ignore")
-        audio = FeatureExtractor.read_audio(file_path)
-
-        audio = FeatureExtractor.augment_data(audio)
-
-        spectrogram = librosa.feature.melspectrogram(audio,
-                                                     sr=conf.PreproccessConfig.sampling_rate,
-                                                     n_mels=conf.PreproccessConfig.n_mels,
-                                                     hop_length=conf.PreproccessConfig.hop_length,
-                                                     n_fft=conf.PreproccessConfig.n_fft,
-                                                     fmin=conf.PreproccessConfig.fmin,
-                                                     fmax=conf.PreproccessConfig.fmax)
-        spectrogram = np.log(spectrogram + 1e-9)  # add small number to avoid log(0)
-
-        img = FeatureExtractor.scale_minmax(spectrogram, 0, 255).astype(np.uint8)
-        img = np.flip(img, axis=0)  # put low frequencies at the bottom in image
-        img = 255 - img  # invert. make black==more energy
-
-        save_path = conf.FilePathConfig.TRAINING_FILES_SPECTOGRAMS
-        file_name = os.path.basename(file_path).split('.')[0]  # file name without extension
-        file_name = '{}.{}'.format(file_name,
-                                   conf.PreproccessConfig.spectogram_file_extension)  # file name and extension default : png for write
-        out = os.path.join(save_path, file_name)  # file name with png extension
-        print(out)
-        skimage.io.imsave(out, img)
 
     @staticmethod
     def scale_minmax(X, min=0.0, max=1.0):
@@ -169,40 +126,6 @@ class FeatureExtractor:
         X_scaled = X_std * (max - min) + min
         return X_scaled
 
-    @staticmethod
-    def extract_from_metadata_table():
-        """
-        Bu fonksiyon çalışma zamanında oluşturulan TEMP/metadata_table.csv dosyasını baz alarak, orada yolu bulunan dosyaların,
-         özniteliklerini çıkartır, ve çalışma zamanında TEMP/Features.joblib dosyasını oluşturur.
-
-         Inputs: none
-         Dependencies: TEMP/metadata_table.csv && FeatureExtractor class methods && Config class
-        :return:
-        """
-        path_conf = conf.FilePathConfig
-        preprocess_conf = conf.PreproccessConfig
-        metadata_df = pd.read_csv(path_conf.DATA_METADATA_DF_PATH)
-        metadata_df = metadata_df.loc[:, ~metadata_df.columns.str.contains('^Unnamed')]
-
-        features_x_path = path_conf.SAVE_RUNTIME_FEATURES_X
-        features_y_path = path_conf.SAVE_RUNTIME_FEATURES_Y
-
-        _, feature_x_lenght = FeatureExtractor.extract('example_audio.ogg',
-                                                       preprocess_conf.desired_features)  # olusacak array shepini almak için
-
-        features_x = np.empty(feature_x_lenght)
-        features_y = []
-        for index, row in metadata_df.iterrows():
-            print("Emotion:{} Dataset:{} {}/{}".format(row['labels'], row['source'], index, len(metadata_df)))
-            row_features, _ = FeatureExtractor.extract(row['path'], preprocess_conf.desired_features)
-            features_x = np.vstack([features_x, row_features])
-            features_y = np.hstack([features_y, row['labels']])
-
-        features_x = features_x[1:]  # trim first np.empty(40)
-        np.save(features_x_path, features_x)
-        np.save(features_y_path, features_y)
-
-        print("Öznitelik çıkarım işlemi sonu")
 
     def extract_with_database(self):
         # Before extraction loop variables decleration block
@@ -267,14 +190,14 @@ class FeatureExtractor:
         augmentation = self.augmentations
 
         if 'white_noise' in augmentation:
-            audio = DataAugmentator.add_white_noise(data)
+            audio = self.data_augmentator.add_white_noise(data)
         if 'stretch' in augmentation:
-            audio = DataAugmentator.stretch(data)
+            audio = self.data_augmentator.stretch(data)
         if 'shift' in augmentation:
-            audio = DataAugmentator.shift(data)
+            audio = self.data_augmentator.shift(data)
         if 'change_speed' in augmentation:
-            audio = DataAugmentator.change_speed(data)
+            audio = self.data_augmentator.change_speed(data)
         else:
             pass
 
-        return data
+        return audio
