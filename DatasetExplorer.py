@@ -42,23 +42,31 @@ class DatasetExplorer:
             print("Dataset Okuma sırasında bir hata oluşmuş olabilir.")
 
     def download_datasets(self):
-
         if len(self.download_queue) == 0:
             print("İstenen verisetleri bilgisayarınızda yüklü.. \nBir sonraki adıma geçiliyor..")
             return
+
         downloads_path = self.path_dict['DOWNLOADS_FOLDER']
         datasets_path = self.path_dict['DATASETS_FOLDER']
-        if 'Ravdess' in self.download_queue:
-            print('Ravdess indiriliyor..')
 
-            # perform download
-            ravdess_downloaded_path = os.path.join(downloads_path, 'Ravdess.zip')
-            url = 'https://zenodo.org/record/1188976/files/Audio_Speech_Actors_01-24.zip?download=1'
-            urllib.request.urlretrieve(url, ravdess_downloaded_path)
+        for dataset in self.download_queue:
+            print('{} indiriliyor'.format(dataset))
+            downloads_path = self.path_dict['DOWNLOADS_FOLDER']
+            datasets_path = self.path_dict['DATASETS_FOLDER']
 
-            # perform unzip
-            with zipfile.ZipFile(ravdess_downloaded_path, 'r') as zip_ref:
-                zip_ref.extractall(os.path.join(datasets_path,'Ravdess'))
+            dataset_zip_name = '{}.zip'.format(dataset)
+            dataset_download_path = os.path.join(datasets_path, dataset_zip_name)
+
+
+            dataset_download_path = os.path.join(downloads_path, dataset_zip_name)
+            download_url = 'https://sentiment-analysis-deep-learning-tool-storage.s3.us-east-2.amazonaws.com/{}'.format(
+                dataset_zip_name)
+            print('{} adresinden indirme işlemi gerçekleşiyor..'.format(download_url))
+            urllib.request.urlretrieve(download_url, dataset_download_path)
+
+            print('{} arşivden çıkartılıyor ve kopyalanıyor..'.format(dataset))
+            with zipfile.ZipFile(dataset_download_path, 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(datasets_path))
 
         # TODO-> implement install and unzip datasets
 
@@ -81,5 +89,3 @@ class DatasetExplorer:
                 except OSError as error:
                     print('Error calling stat():', error, file=sys.stderr)
         return total
-
-

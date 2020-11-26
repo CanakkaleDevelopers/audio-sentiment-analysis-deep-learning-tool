@@ -197,6 +197,58 @@ class FeatureExtractor:
 
         print("Öznitelik çıkarım işlemi sonu")
 
+    def extract_with_database(self):
+        # Before extraction loop variables decleration block
+        save_features_X = 'TEMP/FeaturesX'  # temp_featuresX doya yolu
+        save_features_Y = 'TEMP/FeaturesY'  # temp_featuresY dosya yolu
+        _, features_x_lenght = self.extract('example_audio.ogg')  # dummy # burası değiştirilmememli
+        features_x = np.empty(features_x_lenght)
+        features_y = []
+
+        # Looping all records block
+        lenght_of_records_in_database = 10  # kayıtların toplam sayısı
+        for count in range(lenght_of_records_in_database):  # -> veritabanındaki kayıt sayısı kadar dön
+
+            # query record block
+            record = {'Gender': 'Male', 'Emotion': 'Happy', 'Source': 'Ravdess', 'Path': 'example_audio.ogg',
+                      'augment': True}  # burayı queryi yap sırayla oku qureyi yi bu şekilde getir veya alt tarafları düzenle
+
+            print('Extracting selected features from  {} {} {} audio record. {} file left'.format(record['Source'],
+                                                                                                  record['Emotion'],
+                                                                                                  record['Gender'], (
+                                                                                                          lenght_of_records_in_database - count)))
+
+            # Extracting file himself
+            record_features, _ = self.extract(record['Path'])
+            record_label = record['Emotion']
+
+            features_x = np.vstack([features_x, record_features])
+            features_y = np.hstack([features_y, record_label])
+
+            # Extracting augmented file if True
+            if record['augment']:
+                print('Extracting AUGMENTED record features from  {} {} {} audio record.'.format(
+                    record['Source'],
+                    record['Emotion'],
+                    record['Gender'], ))
+                record_features, _ = self.extract(record['Path'], make_augmentations=True)
+                record_label = record['Emotion']
+
+                features_x = np.vstack([features_x, record_features])
+                features_y = np.hstack([features_y, record_label])
+
+            # save block
+
+            features_x_final = features_x[1:]  # trim first np.empty(40)
+            np.save(save_features_X, features_x_final)
+            np.save(save_features_Y, features_y)
+
+            """
+            if(save_this_features_forever):
+                TODO-> eğer kullanıcı bu featureleri sonra da kullanmak isterse kaydedebilmeli
+                çünkü işlem çok uzun
+            """
+
     def augment_data(self, data):
         """
         returns augmented data if

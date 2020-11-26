@@ -5,22 +5,24 @@ def main():
     import numpy as np
     from DataMetaDataCreator import MetaDataCreator
     from NewModelBuilder import NewModelBuilder
+    from ModelTrainer import ModelTrainer
 
     explore_datasets = False
-    make_feature_extraction = False
+    make_feature_extraction = True
     create_meta_csv = False
     select_pretrained_model = False
-    build_your_model = True
+    build_your_model = False
+    train_your_model = False
 
     """initializing neccesary vars"""
-    path_dict = {'downloads_folder': 'Downloads', 'datasets_folder': 'Datasets',
+    path_dict = {'DOWNLOADS_FOLDER': 'Downloads', 'DATASETS_FOLDER': 'Datasets',
                  'emoDB': 'Datasets/emoDB', 'Ravdess': 'Datasets/Ravdess',
                  'SAVEE': 'Datasets/SAVEE', 'Crema-D': 'Datasets/Crema-D',
-                 'temp_folder': 'TEMP'}
+                 'TEMP_FOLDER': 'TEMP'}
 
     """0.5 inci faz veriseti tarama ve indirme"""
     if explore_datasets:
-        demanded_datasets = ['Ravdess']
+        demanded_datasets = ['emoDB']
         dataset_explorer = DatasetExplorer(demanded_datasets, path_dict)  # demanded_datasets[], path_dict{} yolla
 
         dataset_explorer.scan()  # locali tara
@@ -42,60 +44,11 @@ def main():
     if make_feature_extraction:
         # initialization of FeatureExtractor class block
         feature_extraction_dict = {'sampling_rate': 44100, 'samples': 44100 * 4, 'n_mfcc': 40,
-                                   'features': ['mfcc', 'chroma', 'mel', 'tonnetz', 'mfcc_delta'],
+                                   'features': ['mfcc'],
                                    'augmentations': ['white_noise', 'stretch', 'shift', 'change_speed']}
         f = FeatureExtractor(feature_extraction_dict)  # feature_extraction_dict {} yolla,
 
-        # Before extraction loop variables decleration block
-        save_features_X = 'TEMP/FeaturesX'  # temp_featuresX doya yolu
-        save_features_Y = 'TEMP/FeaturesY'  # temp_featuresY dosya yolu
-        _, features_x_lenght = f.extract('example_audio.ogg')  # dummy # burası değiştirilmememli
-        features_x = np.empty(features_x_lenght)
-        features_y = []
-
-        # Looping all records block
-        lenght_of_records_in_database = 1000  # kayıtların toplam sayısı
-        for count in range(lenght_of_records_in_database):  # -> veritabanındaki kayıt sayısı kadar dön
-
-            # query record block
-            record = {'Gender': 'Male', 'Emotion': 'Happy', 'Source': 'Ravdess', 'Path': 'example_audio.ogg',
-                      'augment': True}  # burayı queryi yap sırayla oku qureyi yi bu şekilde getir veya alt tarafları düzenle
-
-            print('Extracting selected features from  {} {} {} audio record. {} file left'.format(record['Source'],
-                                                                                                  record['Emotion'],
-                                                                                                  record['Gender'], (
-                                                                                                          lenght_of_records_in_database - count)))
-
-            # Extracting file himself
-            record_features, _ = f.extract(record['Path'])
-            record_label = record['Emotion']
-
-            features_x = np.vstack([features_x, record_features])
-            features_y = np.hstack([features_y, record_label])
-
-            # Extracting augmented file if True
-            if record['augment']:
-                print('Extracting AUGMENTED record features from  {} {} {} audio record.'.format(
-                    record['Source'],
-                    record['Emotion'],
-                    record['Gender'], ))
-                record_features, _ = f.extract(record['Path'], make_augmentations=True)
-                record_label = record['Emotion']
-
-                features_x = np.vstack([features_x, record_features])
-                features_y = np.hstack([features_y, record_label])
-
-            # save block
-
-            features_x = features_x[1:]  # trim first np.empty(40)
-            np.save(save_features_X, features_x)
-            np.save(save_features_Y, features_y)
-
-            """
-            if(save_this_features_forever):
-                TODO-> eğer kullanıcı bu featureleri sonra da kullanmak isterse kaydedebilmeli
-                çünkü işlem çok uzun
-            """
+        f.extract_with_database() # bu fonksiyonun içerisine query yerleştirilecek
 
     if build_your_model:
         model_builder = NewModelBuilder()
@@ -112,6 +65,18 @@ def main():
 
         uncompiled_model = model_builder.get_uncompiled_model(my_layers)
         compiled_model = model_builder.get_compiled_model(compile_config)
+
+    if train_your_model:
+        model_train_config = {'save_model':True, 'split_rate':0.66}
+        model_trainer = ModelTrainer(model_train_config,path_dict)
+        model_trainer.train_with_temp_features()
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
