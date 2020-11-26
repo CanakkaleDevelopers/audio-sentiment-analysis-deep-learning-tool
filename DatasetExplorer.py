@@ -24,12 +24,12 @@ class DatasetExplorer:
         """
         try:
             for dataset_folder in os.scandir(
-                    self.path_dict['datasets_folder']):  # phase one -> scan local datasets dir
+                    self.path_dict['DATASETS_FOLDER']):  # phase one -> scan local datasets dir
                 if not dataset_folder.name.startswith('.') and dataset_folder.is_dir():
                     self.local_datasets.append(dataset_folder.name)
                     print("Local dataset found : ", dataset_folder.name, 'Folder size',
                           self.get_tree_size(
-                              os.path.join(self.path_dict['datasets_folder'], dataset_folder.name)) / 10 ** 6,
+                              os.path.join(self.path_dict['DATASETS_FOLDER'], dataset_folder.name)) / 10 ** 6,
                           'MB')
             for dataset in self.to_be_used_datasets:
                 if dataset not in self.local_datasets:
@@ -37,6 +37,7 @@ class DatasetExplorer:
                     self.download_queue.append(dataset)
             print("Eğer bir verisetinin yanlış indirildiğini düşünüyorsanız, "
                   "verisetini silip programı tekrar çalıştırın.")
+            return self.local_datasets
         except:
             print("Dataset Okuma sırasında bir hata oluşmuş olabilir.")
 
@@ -45,8 +46,8 @@ class DatasetExplorer:
         if len(self.download_queue) == 0:
             print("İstenen verisetleri bilgisayarınızda yüklü.. \nBir sonraki adıma geçiliyor..")
             return
-        downloads_path = self.path_dict['downloads_folder']
-        datasets_path = self.path_dict['datasets_folder']
+        downloads_path = self.path_dict['DOWNLOADS_FOLDER']
+        datasets_path = self.path_dict['DATASETS_FOLDER']
         if 'Ravdess' in self.download_queue:
             print('Ravdess indiriliyor..')
 
@@ -57,7 +58,7 @@ class DatasetExplorer:
 
             # perform unzip
             with zipfile.ZipFile(ravdess_downloaded_path, 'r') as zip_ref:
-                zip_ref.extractall(datasets_path)
+                zip_ref.extractall(os.path.join(datasets_path,'Ravdess'))
 
         # TODO-> implement install and unzip datasets
 
@@ -82,7 +83,3 @@ class DatasetExplorer:
         return total
 
 
-
-d = DatasetExplorer(demanded_datasets, path_dict)
-d.scan()
-d.download_datasets()

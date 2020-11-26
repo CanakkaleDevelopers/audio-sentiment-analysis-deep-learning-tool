@@ -4,6 +4,7 @@ def main():
     from DatasetExplorer import DatasetExplorer
     import numpy as np
     from DataMetaDataCreator import MetaDataCreator
+    from NewModelBuilder import NewModelBuilder
 
     explore_datasets = False
     make_feature_extraction = False
@@ -97,7 +98,20 @@ def main():
             """
 
     if build_your_model:
-        pass
+        model_builder = NewModelBuilder()
+
+        input_layer = {'name': 'input_layer', 'input_shape': (40, 1), 'batch_size': (40)}
+        conv_1d = {'name': 'conv_1d', 'filters': 32, 'kernel_size': 3, 'padding': 'same', 'activation':'relu'}
+        dropout = {'name': 'dropout', 'rate': 0.5}
+        dense = {'name': 'dense', 'units': 32, 'activation': 'relu'}
+        batch_normalization = {'name': 'batch_normalization'}
+        flatten = {'name':'flatten'}
+        compile_config = {'optimizer': 'rmsprop', 'loss': 'binary_crossentropy', 'metrics': ['accuracy']}
+
+        my_layers = [input_layer, conv_1d, dropout, dense, batch_normalization,flatten, dense]
+
+        uncompiled_model = model_builder.get_uncompiled_model(my_layers)
+        compiled_model = model_builder.get_compiled_model(compile_config)
 
 
 if __name__ == "__main__":
