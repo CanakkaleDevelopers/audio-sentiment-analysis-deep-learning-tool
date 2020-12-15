@@ -6,19 +6,21 @@ def main():
     from DataMetaDataCreator import MetaDataCreator
     from NewModelBuilder import NewModelBuilder
     from ModelTrainer import ModelTrainer
+    from FeatureExplorer import FeatureExplorer
 
     explore_datasets = False
-    make_feature_extraction = True
+    make_feature_extraction = False
     create_meta_csv = False
     select_pretrained_model = False
     build_your_model = False
     train_your_model = False
+    use_feature_explorer = True
 
     """initializing neccesary vars"""
     path_dict = {'DOWNLOADS_FOLDER': 'Downloads', 'DATASETS_FOLDER': 'Datasets',
                  'emoDB': 'Datasets/emoDB', 'Ravdess': 'Datasets/Ravdess',
                  'SAVEE': 'Datasets/SAVEE', 'Crema-D': 'Datasets/Crema-D',
-                 'TEMP_FOLDER': 'TEMP'}
+                 'TEMP_FOLDER': 'TEMP', 'FEATURES_FOLDER': 'Features'}
 
     """0.5 inci faz veriseti tarama ve indirme"""
     if explore_datasets:
@@ -47,10 +49,24 @@ def main():
                                    'features': ['mfcc'],
                                    'augmentations': ['white_noise', 'stretch', 'shift', 'change_speed']}
         data_augmentation_dict = {'shift_rate': 1600, 'stretch_rate': 1, 'speed_change': 1,
-         'pitch_pm': 24, 'bins_per_octave': 24}
-        f = FeatureExtractor(feature_extraction_dict,data_augmentation_dict)  # feature_extraction_dict {} yolla,
+                                  'pitch_pm': 24, 'bins_per_octave': 24}
+        f = FeatureExtractor(feature_extraction_dict, data_augmentation_dict)  # feature_extraction_dict {} yolla,
 
         f.extract_with_database()  # bu fonksiyonun içerisine query yerleştirilecek
+
+    """
+    Kullanıcının seçeceği featureleri, belki önceden seçtikleri burada seçtirelim.
+    """
+
+    if use_feature_explorer:
+        FExplorer = FeatureExplorer(path_dict)
+
+        features = ['mfcc']
+        title = 'new'
+        note = 'en son cıkarttıgım featureler.'
+        FExplorer.save_from_temp(features, title, note)  # eğer feature extraction yapıldıysa
+
+        # List all features
 
     if build_your_model:
         model_builder = NewModelBuilder()
@@ -63,15 +79,19 @@ def main():
         flatten = {'name': 'flatten'}
         compile_config = {'optimizer': 'rmsprop', 'loss': 'binary_crossentropy', 'metrics': ['accuracy']}
 
-        my_layers = [input_layer, conv_1d, dropout, dense, batch_normalization, flatten, dense]
+        my_layers = [conv_1d, dropout, dense, batch_normalization, flatten, dense]
 
         uncompiled_model = model_builder.get_uncompiled_model(my_layers)
         compiled_model = model_builder.get_compiled_model(compile_config)
 
     if train_your_model:
-        model_train_config = {'save_model': True, 'split_rate': 0.66}
+        model_train_config = {'save_model': True, 'test_split_rate': 0.30, 'batch_size': None, 'use_random_state': True}
+
         model_trainer = ModelTrainer(model_train_config, path_dict)
+        # model_trainer.train_with_temp_features(compiled_model=compiled_model) # eğer başka bir model kullanılmayacaksa
         model_trainer.train_with_temp_features()
+
+
 
 
 if __name__ == "__main__":

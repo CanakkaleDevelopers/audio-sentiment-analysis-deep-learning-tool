@@ -10,7 +10,7 @@ from DataAugmentator import DataAugmentator
 
 
 class FeatureExtractor:
-    def __init__(self, feature_extraction_dict,data_augmentation_dict):
+    def __init__(self, feature_extraction_dict, data_augmentation_dict):
         self.data_augmentator = DataAugmentator(data_augmentation_dict)
         self.sampling_rate = feature_extraction_dict['sampling_rate']
         self.duration = feature_extraction_dict['duration']
@@ -19,7 +19,6 @@ class FeatureExtractor:
         self.features = feature_extraction_dict['features']  # çıkartılacak featureler, liste olmalı
         self.augmentations = feature_extraction_dict['augmentations']
         self.trim_long_data = feature_extraction_dict['trim_long_data']
-
 
     # todo -> add normalize = True
     def read_audio(self, pathname):
@@ -119,13 +118,11 @@ class FeatureExtractor:
 
         return extracted_features, lenght
 
-
     @staticmethod
     def scale_minmax(X, min=0.0, max=1.0):
         X_std = (X - X.min()) / (X.max() - X.min())
         X_scaled = X_std * (max - min) + min
         return X_scaled
-
 
     def extract_with_database(self):
         # Before extraction loop variables decleration block
