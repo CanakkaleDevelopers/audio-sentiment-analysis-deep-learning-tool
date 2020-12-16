@@ -12,9 +12,9 @@ def main():
     make_feature_extraction = False
     create_meta_csv = False
     select_pretrained_model = False
-    build_your_model = False
-    train_your_model = False
-    use_feature_explorer = True
+    build_your_model = True
+    train_your_model = True
+    use_feature_explorer = False
 
     """initializing neccesary vars"""
     path_dict = {'DOWNLOADS_FOLDER': 'Downloads', 'DATASETS_FOLDER': 'Datasets',
@@ -69,9 +69,7 @@ def main():
         # List all features
 
     if build_your_model:
-        model_builder = NewModelBuilder()
-
-        input_layer = {'name': 'input_layer', 'input_shape': (40, 1), 'batch_size': (40)}
+        model_builder = NewModelBuilder(path_dict)
         conv_1d = {'name': 'conv_1d', 'filters': 32, 'kernel_size': 3, 'padding': 'same', 'activation': 'relu'}
         dropout = {'name': 'dropout', 'rate': 0.5}
         dense = {'name': 'dense', 'units': 32, 'activation': 'relu'}
@@ -82,16 +80,15 @@ def main():
         my_layers = [conv_1d, dropout, dense, batch_normalization, flatten, dense]
 
         uncompiled_model = model_builder.get_uncompiled_model(my_layers)
-        compiled_model = model_builder.get_compiled_model(compile_config)
+        compiled_model = model_builder.get_compiled_model(compile_config, uncompiled_model)
 
     if train_your_model:
-        model_train_config = {'save_model': True, 'test_split_rate': 0.30, 'batch_size': None, 'use_random_state': True}
+        model_train_config = {'save_model': True, 'test_split_rate': 0.30, 'batch_size': 2, 'epochs': 10,
+                              'validation_split_rate': 0.2, 'use_random_state': True}
 
         model_trainer = ModelTrainer(model_train_config, path_dict)
         # model_trainer.train_with_temp_features(compiled_model=compiled_model) # eğer başka bir model kullanılmayacaksa
-        model_trainer.train_with_temp_features()
-
-
+        model_trainer.train_with_temp_features(compiled_model)
 
 
 if __name__ == "__main__":
