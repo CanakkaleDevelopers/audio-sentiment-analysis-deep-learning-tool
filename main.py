@@ -20,7 +20,10 @@ def main():
     path_dict = {'DOWNLOADS_FOLDER': 'Downloads', 'DATASETS_FOLDER': 'Datasets',
                  'emoDB': 'Datasets/emoDB', 'Ravdess': 'Datasets/Ravdess',
                  'SAVEE': 'Datasets/SAVEE', 'Crema-D': 'Datasets/Crema-D',
-                 'TEMP_FOLDER': 'TEMP', 'FEATURES_FOLDER': 'Features'}
+                 'TEMP_FOLD'
+                 ''
+                 'ER': 'TEMP', 'FEATURES_FOLDER': 'Features', 'MODELS_FOLDER': 'Models',
+                 'TENSORBOARD_LOGDIR': 'Models/Tensorboard'}
 
     """0.5 inci faz veriseti tarama ve indirme"""
     if explore_datasets:
@@ -46,7 +49,7 @@ def main():
     if make_feature_extraction:
         # initialization of FeatureExtractor class block
         feature_extraction_dict = {'sampling_rate': 44100, 'duration': 4, 'trim_long_data': False, 'n_mfcc': 40,
-                                   'features': ['mfcc'],
+                                   'features': ['mfcc', 'chroma'],
                                    'augmentations': ['white_noise', 'stretch', 'shift', 'change_speed']}
         data_augmentation_dict = {'shift_rate': 1600, 'stretch_rate': 1, 'speed_change': 1,
                                   'pitch_pm': 24, 'bins_per_octave': 24}
@@ -86,7 +89,10 @@ def main():
         model_train_config = {'save_model': True, 'test_split_rate': 0.30, 'batch_size': 2, 'epochs': 10,
                               'validation_split_rate': 0.2, 'use_random_state': True}
 
-        model_trainer = ModelTrainer(model_train_config, path_dict)
+        tensorboard_config = {'use_tensorboard':True}
+
+        model_trainer = ModelTrainer(model_train_config=model_train_config, path_dict=path_dict,
+                                     tensorboard_config=tensorboard_config)
         # model_trainer.train_with_temp_features(compiled_model=compiled_model) # eğer başka bir model kullanılmayacaksa
         model_trainer.train_with_temp_features(compiled_model)
 

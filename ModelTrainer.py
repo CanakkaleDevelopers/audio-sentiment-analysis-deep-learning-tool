@@ -3,10 +3,15 @@ import os
 import json
 from sklearn.model_selection import train_test_split
 from keras.utils import to_categorical
-
+from tensorflow.keras.callbacks import TensorBoard
+import datetime
+import os
+import webbrowser
+import threading
+import time
 
 class ModelTrainer:
-    def __init__(self, model_train_config, path_dict):
+    def __init__(self, model_train_config, path_dict, tensorboard_config):
         self.validation_split_rate = model_train_config['validation_split_rate']
         self.epochs = model_train_config['epochs']
         self.test_split_rate = model_train_config['test_split_rate']
@@ -14,16 +19,22 @@ class ModelTrainer:
         self.use_random_state = model_train_config['use_random_state']
         self.path_dict = path_dict
 
+    def TensorboardThread(self, log_dir):
+        print("Bu şekilde başlatmadıysanız bir cmd veya terminal ekranına şunları yazın")
+        print("tensorboard --logdir " + os.path.abspath(log_dir))
+        print("Varsayılan tarayıcınız üzerinden Tensorboard açılıyor.")
+        time.sleep(0.5)  # tensorboardın kendini ayağa kaldırmasını bekliyelim
+        os.system('tensorboard --logdir' + os.path.abspath(log_dir))
+        webbrowser.open('http://localhost:6006/')
+
     def train_with_temp_features(self, compiled_model):
 
         X = np.load(os.path.join(self.path_dict['TEMP_FOLDER'], 'FeaturesX.npy'))
         Y = np.load(os.path.join(self.path_dict['TEMP_FOLDER'], 'FeaturesY.npy'))
 
-
+        X = X[:, :, np.newaxis]
 
         label_dict, Y = self.string_labels_to_categorical(Y)
-
-
 
         if self.use_random_state:
             X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=self.test_split_rate, random_state=42)
@@ -35,12 +46,20 @@ class ModelTrainer:
         print('Etiketler ve eğitimdeki Değerleri')
         print(json.dumps(label_dict, indent=1))
 
+        print("Tensorboard hazırlanıyor..")
+        print("DİKKAT! Tensorboard'ın programca açılması için programı yetkili kullanıcı olarak başlatmayı unutmayın.")
+        log_dir = self.path_dict['TENSORBOARD_LOGDIR'] + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
+
+        x = threading.Thread(target=self.TensorboardThread(log_dir), args=(1,), daemon=True)
+
         print("Eğitim başlıyor")
+        compiled_model.fit(X, Y, validation_split=self.validation_split_rate, epochs=self.epochs, shuffle=True,
+                           callbacks=[tensorboard_callback])
 
-        print(X_train)
-        print(X_test)
 
-        compiled_model.fit(X_train, y_train, self.validation_split_rate, epochs=self.epochs, shuffle=True)
+
+
 
     def string_labels_to_categorical(self, labels):
 

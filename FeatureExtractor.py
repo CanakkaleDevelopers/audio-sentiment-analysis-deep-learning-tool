@@ -133,7 +133,7 @@ class FeatureExtractor:
         features_y = []
 
         # Looping all records block
-        lenght_of_records_in_database = 10  # kayıtların toplam sayısı
+        lenght_of_records_in_database = 20  # kayıtların toplam sayısı
         for count in range(lenght_of_records_in_database):  # -> veritabanındaki kayıt sayısı kadar dön
 
             # query record block
