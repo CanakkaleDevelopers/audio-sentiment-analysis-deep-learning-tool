@@ -70,14 +70,15 @@ def main():
 
     if build_your_model:
         model_builder = NewModelBuilder(path_dict)
-        conv_1d = {'name': 'conv_1d', 'filters': 32, 'kernel_size': 3, 'padding': 'same', 'activation': 'relu'}
-        dropout = {'name': 'dropout', 'rate': 0.5}
-        dense = {'name': 'dense', 'units': 32, 'activation': 'relu'}
-        batch_normalization = {'name': 'batch_normalization'}
-        flatten = {'name': 'flatten'}
+        conv_1d = {'type': 'conv_1d', 'filters': 32, 'kernel_size': 3, 'padding': 'same', 'activation': 'relu'}
+        dropout = {'type': 'dropout', 'rate': 0.5}
+        dense = {'type': 'dense', 'units': 32, 'activation': 'relu'}
+        batch_normalization = {'type': 'batch_normalization'}
+        flatten = {'type': 'flatten'}
+        dense_2 = {'type': 'dense', 'units': 32, 'activation': 'relu'}
         compile_config = {'optimizer': 'rmsprop', 'loss': 'binary_crossentropy', 'metrics': ['accuracy']}
 
-        my_layers = [conv_1d, dropout, dense, batch_normalization, flatten, dense]
+        my_layers = [conv_1d, dropout, dense, batch_normalization, flatten, dense_2]
 
         uncompiled_model = model_builder.get_uncompiled_model(my_layers)
         compiled_model = model_builder.get_compiled_model(compile_config, uncompiled_model)

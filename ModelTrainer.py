@@ -18,7 +18,7 @@ class ModelTrainer:
 
         X = np.load(os.path.join(self.path_dict['TEMP_FOLDER'], 'FeaturesX.npy'))
         Y = np.load(os.path.join(self.path_dict['TEMP_FOLDER'], 'FeaturesY.npy'))
-
+        X = X[:, :, np.newaxis] 
 
 
         label_dict, Y = self.string_labels_to_categorical(Y)
@@ -40,7 +40,7 @@ class ModelTrainer:
         print(X_train)
         print(X_test)
 
-        compiled_model.fit(X_train, y_train, self.validation_split_rate, epochs=self.epochs, shuffle=True)
+        compiled_model.fit(X_train, y_train, validation_split=self.validation_split_rate, epochs=self.epochs, shuffle=True)
 
     def string_labels_to_categorical(self, labels):
 

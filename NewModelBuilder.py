@@ -4,10 +4,10 @@ import os
 from keras import layers
 
 # input ve output layerleri burda verilmeyecek
-conv_1d = {'name': 'conv_1d', 'filters': 32, 'kernel_size': 3, 'padding': 'same'}
-dropout = {'name': 'dropout', 'rate': 0.5}
-dense = {'name': 'dense', 'units': 32, 'activation': 'relu'}
-batch_normalization = {'name': 'batch_normalization'}
+conv_1d = {'type': 'conv_1d', 'filters': 32, 'kernel_size': 3, 'padding': 'same'}
+dropout = {'type': 'dropout', 'rate': 0.5}
+dense = {'type': 'dense', 'units': 32, 'activation': 'relu'}
+batch_normalization = {'type': 'batch_normalization'}
 
 my_layers = [conv_1d, dropout, dense]
 
@@ -36,22 +36,23 @@ class NewModelBuilder:
         print(output_shape)
 
         model.add(keras.layers.InputLayer(input_shape=X.shape[1:]))  # input shape
-
+        layer_type=''
         for layer in model_layers:
-            if layer['name'] == 'conv_1d':
-                print('Conv_1D katmanı eklendi.')
-                new_layer = keras.layers.Conv1D(filters=layer['filters'], kernel_size=layer['kernel_size'],
-                                                activation=layer['activation'])
-            elif layer['name'] == 'dropout':
+            layer_type = layer['type'] 
+            del layer['type']
+            
+            if layer_type == 'conv_1d':                
+                new_layer = keras.layers.Conv1D(**layer)
+            elif layer_type == 'dropout':
                 print('Dropout katmanı eklendi.')
-                new_layer = keras.layers.Dropout(rate=layer['rate'])
-            elif layer['name'] == 'dense':
+                new_layer = keras.layers.Dropout(**layer)
+            elif layer_type == 'dense':
                 print('Dense katmanı eklendi.')
-                new_layer = keras.layers.Dense(layer['units'], activation=layer['activation'])
-            elif layer['name'] == 'batch_normalization':
+                new_layer = keras.layers.Dense(**layer)
+            elif layer_type == 'batch_normalization':
                 print('Batch Normalization katmanı eklendi.')
                 new_layer = keras.layers.BatchNormalization()
-            elif layer['name'] == 'flatten':
+            elif layer_type == 'flatten':
                 print('Flatten katmanı eklendi..')
                 new_layer = keras.layers.Flatten()
             else:
