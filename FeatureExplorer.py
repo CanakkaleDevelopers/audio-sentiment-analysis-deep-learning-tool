@@ -1,6 +1,6 @@
 import os
 import shutil
-
+import time
 
 class FeatureExplorer:
 
@@ -23,7 +23,7 @@ class FeatureExplorer:
         info_txt = os.path.join(save_path, 'info.txt')
 
         strFeatures = ' '.join([str(elem) for elem in features])
-        Features = strFeatures
+        Features = strFeatures+"-{}".format(time.ctime(time.time()))
         Note = Features + '\n' + note
 
         f = open(info_txt, "w+")
