@@ -86,15 +86,17 @@ def main():
         compiled_model = model_builder.get_compiled_model(compile_config, uncompiled_model)
 
     if train_your_model:
-        model_train_config = {'save_model': True, 'test_split_rate': 0.30, 'batch_size': 2, 'epochs': 10,
+        model_train_config = {'save_model': True, 'test_split_rate': 0.30, 'batch_size': 2, 'epochs': 50,
                               'validation_split_rate': 0.2, 'use_random_state': True}
 
-        tensorboard_config = {'use_tensorboard':True}
+        tensorboard_config = {'use_tensorboard': True}
 
         model_trainer = ModelTrainer(model_train_config=model_train_config, path_dict=path_dict,
                                      tensorboard_config=tensorboard_config)
         # model_trainer.train_with_temp_features(compiled_model=compiled_model) # eğer başka bir model kullanılmayacaksa
         model_trainer.train_with_temp_features(compiled_model)
+
+
 
 
 if __name__ == "__main__":
