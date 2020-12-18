@@ -1,24 +1,31 @@
 {% extends 'layout.html' %}
 {% block title %}Page-Index{% endblock %}
 {% block content %}
-    <div >
-    <form>
-  <div class="form-group">
-    <label for="exampleInputEmail1">Email address</label>
-    <label for="exampleInputEmail1">{{ gender }}</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="{{ email }}">
-    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">Password</label>
-    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-  </div>
-  <div class="form-group form-check">
-    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-  </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800 text-center">ANASAYFA</h1>
+
+    </div>
+    <div class="text-center">
+
+        <a href="{{ url_for('web_select_dataset') }}" target="_blank">
+            <button type="submit" class="btn btn-primary">Dataset Seçimi</button>
+        </a>
+        <br>
+        <br>
+        <br>
+        <a href="{{ url_for('web_select_metadata') }}" target="_blank">
+            <button type="submit" class="btn btn-primary">Metadata Seçimi</button>
+        </a>
+        <br>
+        <br>
+        <br>
+        <a href="{{url_for('web_select_features')}}" target="_blank">
+            <button type="submit" class="btn btn-primary">Feature Extraction</button>
+        </a>
+        <br>
+        <br>
+        <br>
+
 
     </div>
 {% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'layout.html' %}
+{% block title %}Page-Index{% endblock %}
+{% block content %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">FEATURE EXTRACTION PANELİ</h1>
+
+    </div>
+    <div>
+        <form action="{{ url_for('web_create_features') }}" method="post" enctype="application/x-www-form-urlencoded"
+              target="_blank">
+            <div class="form-group form-text">
+                <label for="sampling_rate">sampling_rate (default olarak kalması tercih edilir.)</label>
+                <input type="text" id="sampling_rate" value="44100" name="sampling_rate" class="form-control" readonly>
+            </div>
+            <div class="form-group form-text">
+                <label for="duration">duration</label>
+                <input type="text" id="duration" value="4" name="duration" class="form-control">
+            </div>
+            <div class="form-group form-text">
+                <label for="n_mfcc">n_mfcc</label>
+                <input type="text" id="n_mfcc" value="40" name="n_mfcc" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="trim_long_data">trim_long_data</label>
+                <select class="form-control" id="trim_long_data" name="trim_long_data">
+                    <option>True</option>
+                    <option selected>False</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="features">features</label>
+                <select multiple class="form-control" id="features" name="features">
+                    <option value="" hidden selected></option>
+                    <option value="mfcc">mfcc</option>
+                    <option value="chroma">chroma</option>
+                    <option value="mel">mel</option>
+                    <option value="contrast">contrast</option>
+                    <option value="tonnetz">tonnetz</option>
+                    <option value="mfcc_delta">mfcc_delta</option>
+                </select>
+            </div>
+            <input type="checkbox" name="augmentations" value="" hidden checked>
+            <div class="form-group">
+                <div class="accordion" id="accordionExample">
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <h2 class="mb-0">
+                                <button class="btn btn-link" type="button" data-toggle="collapse"
+                                        data-target="#collapseOne"
+                                        aria-expanded="false" aria-controls="collapseOne">
+                                    white_noise
+                                    <input type="checkbox" name="augmentations" value="white_noise">
+                                </button>
+                            </h2>
+
+                        </div>
+
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne"
+                             data-parent="#accordionExample">
+                            <div class="card-body">
+                                White Noise Hakkında Açıklama
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="headingTwo">
+                            <h2 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                                        data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    stretch
+                                    <input type="checkbox" name="augmentations" value="stretch">
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                             data-parent="#accordionExample">
+                            <div class="card-body">
+                                <div class="form-group form-text">
+                                    <label for="pitch_pm">spitch_pm</label>
+                                    <input type="text" id="pitch_pm" value="24" name="pitch_pm"
+                                           class="form-control">
+                                </div>
+                                <div class="form-group form-text">
+                                    <label for="bins_per_octave">bins_per_octave</label>
+                                    <input type="text" id="bins_per_octave" value="24" name="bins_per_octave"
+                                           class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="headingThree">
+                            <h2 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                                        data-target="#collapseThree" aria-expanded="false"
+                                        aria-controls="collapseThree">
+                                    shift
+                                    <input type="checkbox" name="augmentations" value="shift">
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree"
+                             data-parent="#accordionExample">
+                            <div class="card-body">
+                                <div class="form-group form-text">
+                                    <label for="shift_rate">shift_rate</label>
+                                    <input type="text" id="shift_rate" value="1600" name="shift_rate"
+                                           class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="headingFour">
+                            <h2 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                                        data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                    change_speed
+                                    <input type="checkbox" name="augmentations" value="change_speed">
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="collapseFour" class="collapse" aria-labelledby="headingFour"
+                             data-parent="#accordionExample">
+                            <div class="card-body">
+                                <div class="form-group form-text">
+                                    <label for="speed_change">speed_change</label>
+                                    <input type="text" id="speed_change" value="1" name="speed_change"
+                                           class="form-control">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group ">
+                <button type="submit" class="btn btn-primary">ONAYLA</button>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}

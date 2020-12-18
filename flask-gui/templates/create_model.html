@@ -1,0 +1,73 @@
+{% extends 'layout.html' %}
+{% block title %}Page-Index{% endblock %}
+{% block content %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">DATASET SEÇİM PANELİ</h1>
+
+    </div>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">MODEL OLUŞTURUCU</h6>
+
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" id="dropdownMenuButton" type="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Katman Ekle
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="{{ url_for("web_create_model_conv_1d") }}">Conv_1D</a>
+                    <a class="dropdown-item" href="{{ url_for("web_create_model_dropout") }}">DropOut</a>
+                    <a class="dropdown-item" href="{{ url_for("web_create_model_dense") }}">Dense</a>
+                    <a class="dropdown-item" href="{{ url_for("web_create_model_batch_normalization") }}">Batch_Normalization</a>
+                    <a class="dropdown-item" href="{{ url_for("web_create_model_flatten") }}">Flatten</a>
+                    <a class="dropdown-item" href="#!"></a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered text-center" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                    <tr>
+                        {% for column in columns %}
+                            <th>{{ column }}</th>
+                        {% endfor %}
+                        <th>İŞLEMLER</th>
+                    </tr>
+
+
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        {% for column in columns %}
+                            <th>{{ column }}</th>
+                        {% endfor %}
+                        <th>İŞLEMLER</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    {% for layer in layers %}
+                        <tr>
+                            {% for column in columns %}
+                                {% if layer[column] == "" %}
+                                    <td style="background-color: darkred">
+
+                                    </td>
+
+                                {% else %}
+                                    <td>
+                                        {{ layer[column] }}
+                                    </td>
+                                {% endif %}
+
+                            {% endfor %}
+                            <td>
+                                <a href="{{ url_for("web_delete_model_layer",layer_id = layer['id']) }}">SİL</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

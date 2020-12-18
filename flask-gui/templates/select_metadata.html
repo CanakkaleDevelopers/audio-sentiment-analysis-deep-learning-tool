@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+{% block title %}Page-Index{% endblock %}
+{% block content %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">METADATA SEÇİM PANELİ</h1>
+
+    </div>
+    <div>
+        <form action="{{url_for('web_create_metadata')}}" method="post"  enctype="application/x-www-form-urlencoded" target="_blank">
+            <div class="form-group form-check">
+                {% for dataset in datasets %}
+                    <input name="{{ dataset.name }}" type="checkbox" class="form-check-input" id="{{ dataset.name }}">
+                    <label class="form-check-label" for="{{ dataset.name }}">{{ dataset.name }}</label>
+                    <label class="form-check-label" for="{{ dataset.name }}">| {% if dataset.isdownloaded == "1" %}
+                        İNDİRİLDİ{% else %}İNDİRİLMEDİ{% endif %}</label>
+                    <label class="form-check-label" for="{{ dataset.name }}">| {% if dataset.ismeta == "1" %}META
+                        OLUŞTURULDU{% else %}META OLUŞTURULMADI{% endif %}</label>
+                    <br>
+
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary">ONAYLA</button>
+        </form>
+    </div>
+{% endblock %}

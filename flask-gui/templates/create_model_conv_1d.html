@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+{% block title %}Page-Index{% endblock %}
+{% block content %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">CONV_1D</h1>
+
+    </div>
+    <div>
+        <form action="{{ url_for('web_create_model_conv_1d') }}" method="post" enctype="application/x-www-form-urlencoded"
+              target="_blank">
+            <div class="form-group form-text">
+                <label for="filters">filters(int)</label>
+                <input type="text" id="filters"  name="filters" class="form-control">
+            </div>
+            <div class="form-group form-text">
+                <label for="kernel_size">kernel size(int)</label>
+                <input type="text" id="kernel_size"  name="kernel_size" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="features">features</label>
+                <select class="form-control" id="padding" name="padding">
+                    <option value="valid">valid</option>
+                    <option value="same">same</option>
+                    <option value="causal">causal</option>
+                </select>
+            </div>
+            <div class="form-group ">
+                <button type="submit" class="btn btn-primary">ONAYLA</button>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+{% block title %}Page-Index{% endblock %}
+{% block content %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">CONV_1D</h1>
+
+    </div>
+    <div>
+        <form action="{{ url_for('web_create_model_dense') }}" method="post" enctype="application/x-www-form-urlencoded"
+              target="_blank">
+            <div class="form-group form-text">
+                <label for="units">units(int)</label>
+                <input type="text" id="units"  name="units" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="activation">activation</label>
+                <select class="form-control" id="activation" name="activation">
+                    <option value="relu">relu</option>
+                    <option value="sigmoid">sigmoid</option>
+                    <option value="softmax">softmax</option>
+                    <option value="softplus">softplus</option>
+                    <option value="tanh">tanh</option>
+                    <option value="selu">selu</option>
+                    <option value="elu">elu</option>
+                </select>
+            </div>
+            <div class="form-group ">
+                <button type="submit" class="btn btn-primary">ONAYLA</button>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}
