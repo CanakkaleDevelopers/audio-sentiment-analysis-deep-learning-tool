@@ -3,6 +3,7 @@ import os
 import json
 from sklearn.model_selection import train_test_split
 from keras.utils import to_categorical
+from keras.models import load_model
 from tensorflow.keras.callbacks import TensorBoard
 import datetime
 import os
@@ -21,7 +22,10 @@ class ModelTrainer:
         self.use_random_state = model_train_config['use_random_state']
         self.path_dict = path_dict
 
-    def train_with_temp_features(self, compiled_model):
+    def train_with_temp_features(self):
+
+        model_path = os.path.join(self.path_dict['TEMP_FOLDER'], 'runtime_model')
+        compiled_model = load_model(model_path)
 
         X = np.load(os.path.join(self.path_dict['TEMP_FOLDER'], 'FeaturesX.npy'))
         Y = np.load(os.path.join(self.path_dict['TEMP_FOLDER'], 'FeaturesY.npy'))

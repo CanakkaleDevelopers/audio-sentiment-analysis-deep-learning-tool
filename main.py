@@ -72,7 +72,6 @@ def main():
         # List all features
 
     if build_your_model:
-        model_builder = NewModelBuilder(path_dict)
         conv_1d = {'type': 'conv_1d', 'filters': 32, 'kernel_size': 3, 'padding': 'same', 'activation': 'relu'}
         dropout = {'type': 'dropout', 'rate': 0.5}
         dense = {'type': 'dense', 'units': 32, 'activation': 'relu'}
@@ -83,8 +82,8 @@ def main():
 
         my_layers = [conv_1d, dropout, dense, batch_normalization, flatten, dense_2]
 
-        uncompiled_model = model_builder.get_uncompiled_model(my_layers)
-        compiled_model = model_builder.get_compiled_model(compile_config, uncompiled_model)
+        model_builder = NewModelBuilder(path_dict, my_layers, compile_config)
+        model_builder.build()
 
     if train_your_model:
         model_train_config = {'save_model': True, 'test_split_rate': 0.30, 'batch_size': 2, 'epochs': 50,
@@ -94,10 +93,8 @@ def main():
 
         model_trainer = ModelTrainer(model_train_config=model_train_config, path_dict=path_dict,
                                      tensorboard_config=tensorboard_config)
-        # model_trainer.train_with_temp_features(compiled_model=compiled_model) # eğer başka bir model kullanılmayacaksa
-        model_trainer.train_with_temp_features(compiled_model)
-
-
+        model_trainer.train_with_temp_features()
+        #model_trainer.train_with_temp_features(compiled_model)
 
 
 if __name__ == "__main__":
