@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+{% block title %}Page-Index{% endblock %}
+{% block content %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Model Derleme Yapılandırması</h1>
+
+    </div>
+    <div>
+        <form action="{{ url_for('web_create_compile_config') }}" method="post"
+              enctype="application/x-www-form-urlencoded"
+              target="_blank">
+
+
+            <div class="form-group">
+                <label for="optimizer">optimizer</label>
+                <select class="form-control" id="optimizer" name="optimizer">
+                    <option value="sgd">sgd</option>
+                    <option selected value="rmsprop">rmsprop</option>
+                    <option value="adam">adam</option>
+                    <option value="adadelta">adadelta</option>
+                    <option value="adagrad">adagrad</option>
+                    <option value="adamax">adamax</option>
+                    <option value="nadam">nadam</option>
+                    <option value="ftrl">ftrl</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="loss">loss</label>
+                <select class="form-control" id="loss" name="loss">
+                    <option value="mean_squared_error">mean_squared_error</option>
+                    <option value="mean_squared_logarithmic_error">mean_squared_logarithmic_error</option>
+                    <option value="mean_absolute_error">mean_absolute_error</option>
+                    <option selected value="binary_crossentropy">binary_crossentropy</option>
+                    <option value="hinge">hinge</option>
+                    <option value="squared_hinge">squared_hinge</option>
+                    <option value="categorical_crossentropy">categorical_crossentropy</option>
+                    <option value="sparse_categorical_crossentropy">sparse_categorical_crossentropy</option>
+                </select>
+            </div>
+            <div class="form-group ">
+                <button type="submit" class="btn btn-primary">Modeli Oluştur.</button>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}

@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from library.DatasetExplorer import DatasetExplorer
 from library.DataMetaDataCreator import MetaDataCreator
 from library.FeatureExtractor import FeatureExtractor
+from library.ModelBuilder import NewModelBuilder
+from library.ModelTrainer import ModelTrainer
 from database.models import DbDatasetCatalog, DbDatasetMeta, DbConfig, db, DbModel
 
 from multiprocessing import Process
@@ -65,18 +67,19 @@ def web_create_features():
     a = request.form.to_dict(flat=True)
     a['features'] = request.form.getlist("features")
     a['augmentations'] = request.form.getlist("augmentations")
-    a['sampling_rate'] = int(a['sampling_rate'])
-    a['duration'] = int(a['duration'])
-    a['n_mfcc'] = int(a['n_mfcc'])
-    a['sampling_rate'] = int(a['sampling_rate'])
-    a['pitch_pm'] = int(a['pitch_pm'])
-    a['bins_per_octave'] = int(a['bins_per_octave'])
-    a['shift_rate'] = int(a['shift_rate'])
-    a['speed_change'] = int(a['speed_change'])
+    a['sampling_rate'] = float(a['sampling_rate'])
+    a['duration'] = float(a['duration'])
+    a['n_mfcc'] = float(a['n_mfcc'])
+    a['sampling_rate'] = float(a['sampling_rate'])
+    a['pitch_pm'] = float(a['pitch_pm'])
+    a['bins_per_octave'] = float(a['bins_per_octave'])
+    a['shift_rate'] = float(a['shift_rate'])
+    a['speed_change'] = float(a['speed_change'])
     a['trim_long_data'] = bool(strtobool(a['trim_long_data']))
 
     print(a)
     f = FeatureExtractor(a, a, DbDatasetMeta.query.all())  # feature_extraction_dict {} yolla
+
     f.extract_with_database()
 
     return "finished"
@@ -146,6 +149,47 @@ def web_delete_model_layer(layer_id):
     db.session.delete(DbModel.query.get(layer_id))
     db.session.commit()
     return redirect(url_for('web_create_model'))
+
+
+@app.route("/select_compile_config")
+def web_select_compile_config():
+    return render_template("select_compile_config.html")
+
+
+@app.route("/create_compile_config", methods=['POST'])
+def web_create_compile_config():
+    a = request.form.to_dict(flat=True)
+    model_builder = NewModelBuilder(DbConfig.query.first().__dict__, DbModel.query.all(), a)
+    model_builder.build()
+    return "finished"\
+
+@app.route("/select_model_trainer")
+def web_select_model_trainer():
+    return render_template("select_model_trainer.html")
+
+
+@app.route("/model_trainer", methods=['POST'])
+def web_model_trainer():
+    from distutils.util import strtobool
+    a = request.form.to_dict(flat=True)
+    a['save_model'] = bool(strtobool(a['save_model']))
+    a['use_random_state'] = bool(strtobool(a['use_random_state']))
+    a['use_tensorboard'] = bool(strtobool(a['use_tensorboard']))
+
+    a['test_split_rate'] = float(a['test_split_rate'])
+    a['batch_size'] = int(a['batch_size'])
+    a['epochs'] = int(a['epochs'])
+    a['validation_split_rate'] = float(a['validation_split_rate'])
+    model_trainer = ModelTrainer(model_train_config=a, path_dict=DbConfig.query.first().__dict__,
+                                    tensorboard_config=a)
+    model_trainer.train_with_temp_features()
+
+
+
+    print(a)
+    # model_builder = NewModelBuilder(DbConfig.query.first().__dict__, DbModel.query.all(), a)
+    # model_builder.build()
+    return "finished"
 
 
 @app.route('/test')

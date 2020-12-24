@@ -87,18 +87,18 @@ class DbModel(db.Model):
     __tablename__ = 'model'
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(500))
-    filters = db.Column(db.String(500))
-    kernel_size = db.Column(db.String(500))
+    filters = db.Column(db.Integer())
+    kernel_size = db.Column(db.Integer())
     padding = db.Column(db.String(500))
     activation = db.Column(db.String(500))
-    rate = db.Column(db.String(500))
-    units = db.Column(db.String(500))
+    rate = db.Column(db.Float())
+    units = db.Column(db.Integer())
     optimizer = db.Column(db.String(500))
     loss = db.Column(db.String(500))
     metrics = db.Column(db.String(500))
 
-    def __init__(self, type, filters="", kernel_size="", padding="", activation="", rate="", units="", optimizer="",
-                 loss="", metrics=""):
+    def __init__(self, type, filters=None, kernel_size=None, padding=None, activation=None, rate=None, units=None, optimizer=None,
+                 loss=None, metrics=None):
         self.type = type
         self.filters = filters
         self.kernel_size = kernel_size

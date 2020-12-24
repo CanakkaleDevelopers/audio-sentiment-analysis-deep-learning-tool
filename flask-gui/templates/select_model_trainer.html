@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+{% block title %}Page-Index{% endblock %}
+{% block content %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Model Eğitimi Yapılandırması</h1>
+
+    </div>
+    <div>
+        <form action="{{ url_for('web_model_trainer') }}" method="post"
+              enctype="application/x-www-form-urlencoded"
+              target="_blank">
+            <div class="form-group">
+                <label for="save_model">save_model</label>
+                <select class="form-control" id="save_model" name="save_model">
+                    <option selected>True</option>
+                    <option>False</option>
+                </select>
+            </div>
+
+            <div class="form-group form-text">
+                <label for="test_split_rate">test_split_rate</label>
+                <input type="text" id="test_split_rate" value="0.30" name="test_split_rate" class="form-control">
+            </div>
+
+            <div class="form-group form-text">
+                <label for="batch_size">batch_size</label>
+                <input type="text" id="batch_size" value="2" name="batch_size" class="form-control">
+            </div>
+
+            <div class="form-group form-text">
+                <label for="epochs">epochs</label>
+                <input type="text" id="epochs" value="50" name="epochs" class="form-control">
+            </div>
+
+            <div class="form-group form-text">
+                <label for="validation_split_rate">validation_split_rate</label>
+                <input type="text" id="validation_split_rate" value="0.2" name="validation_split_rate" class="form-control">
+            </div>
+
+             <div class="form-group">
+                <label for="use_random_state">use_random_state</label>
+                <select class="form-control" id="use_random_state" name="use_random_state">
+                    <option selected>True</option>
+                    <option>False</option>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+                <label for="use_tensorboard">use_tensorboard</label>
+                <select class="form-control" id="use_tensorboard" name="use_tensorboard">
+                    <option selected>True</option>
+                    <option>False</option>
+                </select>
+            </div>
+
+
+
+
+
+            <div class="form-group ">
+                <button type="submit" class="btn btn-primary">Modeli Eğit.</button>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,86 @@
+import keras
+import numpy as np
+import os
+
+
+class NewModelBuilder:
+    latest_model = None
+
+    def __init__(self, path_dict, model_layers, compile_config):
+        self.path_dict = path_dict
+        self.model_layers = model_layers
+        self.compile_config = compile_config
+        # print(self.path_dict)
+
+    def get_uncompiled_model(self):
+        print('Model yapısı oluşturuluyor')
+
+        model = keras.Sequential()
+        # add input layer
+
+        X = np.load(os.path.join(self.path_dict['SAVE_RUNTIME_FEATURES'], 'FeaturesX.npy'))
+        Y = np.load(os.path.join(self.path_dict['SAVE_RUNTIME_FEATURES'], 'FeaturesY.npy'))
+
+        X = X[:, :, np.newaxis]
+
+        input_shape = X.shape[1:]
+        output_shape = Y.shape[0]
+
+        # print(input_shape)
+        # print(output_shape)
+
+        model.add(keras.layers.InputLayer(input_shape=X.shape[1:]))  # input shape
+        layer_type = ''
+        for layerx in self.model_layers:
+            layer = layerx.__dict__
+            layer_type = layer['type']   #düzenlendi . Bu şekilde ulaşılabiliyor.
+            del layer['type']
+            del layer['id']
+            del layer['_sa_instance_state']
+            layer = {k: v for k, v in layer.items() if v is not None}
+
+            if layer_type == 'conv_1d':
+                new_layer = keras.layers.Conv1D(**layer)
+                print('conv_1d katmanı eklendi.')
+
+            elif layer_type == 'dropout':
+
+                print('Dropout katmanı eklendi.')
+                new_layer = keras.layers.Dropout(**layer)
+            elif layer_type == 'dense':
+                print('Dense katmanı eklendi.')
+                new_layer = keras.layers.Dense(**layer)
+            elif layer_type == 'batch_normalization':
+                print('Batch Normalization katmanı eklendi.')
+                new_layer = keras.layers.BatchNormalization()
+            elif layer_type == 'flatten':
+                print('Flatten katmanı eklendi..')
+                new_layer = keras.layers.Flatten()
+            else:
+                print('Unreckognized layer')
+                continue
+
+            model.add(new_layer)
+
+        model.add(keras.layers.Dense(output_shape, activation='softmax'))  # output shape
+
+        return model
+
+    def get_compiled_model(self, uncompiled_model):
+        print('Model, {} optimizeri, {} kayıp fonksiyonu ile derleniyor.'.format(self.compile_config['optimizer'],
+                                                                                 self.compile_config['loss']))
+
+        uncompiled_model.compile(optimizer=self.compile_config['optimizer'],
+                                 loss=self.compile_config['loss'],
+                                 metrics=['accuracy'])
+
+        model = uncompiled_model
+
+        return model
+
+    def build(self):
+        model = self.get_uncompiled_model()
+        model = self.get_compiled_model(model)
+        model_path = os.path.join(self.path_dict['SAVE_RUNTIME_FEATURES'], 'runtime_model')
+        print("Model TEMP klasörünün altına oluşturuldu")
+        model.save(model_path)
