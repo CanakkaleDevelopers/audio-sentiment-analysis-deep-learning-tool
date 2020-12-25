@@ -172,7 +172,7 @@ class MetaDataCreator:
 
         for root, dirs, files in os.walk(EMODB_PATH):
             for name in files:
-                if name[0:2] in '0310111215':  # o zaman bu bir erkek
+                if name[0:2] in '0310111215':  # Male Voice if includes '03' || '10' || ..
                     if name[5] == 'W':  # Ärger (Wut) -> Angry
                         emotion.append('male_angry')
                     elif name[5] == 'L':  # Langeweile -> Boredom

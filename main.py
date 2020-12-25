@@ -80,7 +80,7 @@ def main():
         dense_2 = {'type': 'dense', 'units': 32, 'activation': 'relu'}
         compile_config = {'optimizer': 'rmsprop', 'loss': 'binary_crossentropy', 'metrics': ['accuracy']}
 
-        my_layers = [conv_1d, dropout, dense, batch_normalization, flatten, dense_2]
+        my_layers = [conv_1d, dropout, dense, dense_2]
 
         model_builder = NewModelBuilder(path_dict, my_layers, compile_config)
         model_builder.build()
