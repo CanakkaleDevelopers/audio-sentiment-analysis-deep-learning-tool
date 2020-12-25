@@ -16,11 +16,23 @@ class NewModelBuilder:
 
         model = keras.Sequential()
         # add input layer
-
         X = np.load(os.path.join(self.path_dict['TEMP_FOLDER'], 'FeaturesX.npy'))
         Y = np.load(os.path.join(self.path_dict['TEMP_FOLDER'], 'FeaturesY.npy'))
-
+        
+        unique_elements = {}
+        label_code = 0
+        for i in Y:
+            if i not in unique_elements:
+                unique_elements[i] = label_code
+                label_code += 1
+        
+        new_labels = []
+        for i in Y:
+            new_labels.append(unique_elements[i])
+        
+        Y = np.asarray(new_labels)        
         X = X[:, :, np.newaxis]
+        Y = Y[:, np.newaxis]
 
         input_shape = X.shape[1:]
         output_shape = Y.shape[0]

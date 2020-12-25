@@ -78,9 +78,9 @@ def main():
         batch_normalization = {'type': 'batch_normalization'}
         flatten = {'type': 'flatten'}
         dense_2 = {'type': 'dense', 'units': 32, 'activation': 'relu'}
-        compile_config = {'optimizer': 'rmsprop', 'loss': 'binary_crossentropy', 'metrics': ['accuracy']}
+        compile_config = {'optimizer': 'rmsprop', 'loss': 'sparse_categorical_crossentropy', 'metrics': ['accuracy']}
 
-        my_layers = [conv_1d, dropout, dense, dense_2]
+        my_layers = [conv_1d, flatten, dropout, dense, dense_2]
 
         model_builder = NewModelBuilder(path_dict, my_layers, compile_config)
         model_builder.build()

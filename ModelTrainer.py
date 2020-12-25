@@ -29,11 +29,24 @@ class ModelTrainer:
 
         X = np.load(os.path.join(self.path_dict['TEMP_FOLDER'], 'FeaturesX.npy'))
         Y = np.load(os.path.join(self.path_dict['TEMP_FOLDER'], 'FeaturesY.npy'))
-
+        
+        unique_elements = {}
+        label_code = 0
+        for i in Y:
+            if i not in unique_elements:
+                unique_elements[i] = label_code
+                label_code += 1
+        
+        new_labels = []
+        for i in Y:
+            new_labels.append(unique_elements[i])
+        
+        Y = np.asarray(new_labels)        
         X = X[:, :, np.newaxis]
+        Y = Y[:, np.newaxis]
 
-        label_dict, Y = self.string_labels_to_categorical(Y)
 
+        
         if self.use_random_state:
             X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=self.test_split_rate, random_state=42)
         else:
@@ -41,8 +54,6 @@ class ModelTrainer:
 
         print('{} oranında test ve train olarak bölündü.'.format(self.test_split_rate))
 
-        print('Etiketler ve eğitimdeki Değerleri')
-        print(json.dumps(label_dict, indent=1))
 
         print("Tensorboard hazırlanıyor..")
         print("DİKKAT! Tensorboard'ın programca açılması için programı yetkili kullanıcı olarak başlatmayı unutmayın.")
