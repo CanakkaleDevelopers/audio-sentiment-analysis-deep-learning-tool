@@ -17,23 +17,35 @@ class NewModelBuilder:
 
         model = keras.Sequential()
         # add input layer
-
         X = np.load(os.path.join(self.path_dict['SAVE_RUNTIME_FEATURES'], 'FeaturesX.npy'))
         Y = np.load(os.path.join(self.path_dict['SAVE_RUNTIME_FEATURES'], 'FeaturesY.npy'))
 
+        unique_elements = {}
+        label_code = 0
+        for i in Y:
+            if i not in unique_elements:
+                unique_elements[i] = label_code
+                label_code += 1
+
+        new_labels = []
+        for i in Y:
+            new_labels.append(unique_elements[i])
+
+        Y = np.asarray(new_labels)
         X = X[:, :, np.newaxis]
+        Y = Y[:, np.newaxis]
 
         input_shape = X.shape[1:]
         output_shape = Y.shape[0]
 
-        # print(input_shape)
-        # print(output_shape)
+        print(input_shape)
+        print(output_shape)
 
         model.add(keras.layers.InputLayer(input_shape=X.shape[1:]))  # input shape
         layer_type = ''
         for layerx in self.model_layers:
             layer = layerx.__dict__
-            layer_type = layer['type']   #düzenlendi . Bu şekilde ulaşılabiliyor.
+            layer_type = layer['type']  # düzenlendi . Bu şekilde ulaşılabiliyor.
             del layer['type']
             del layer['id']
             del layer['_sa_instance_state']

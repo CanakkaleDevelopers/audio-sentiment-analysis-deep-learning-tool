@@ -23,16 +23,26 @@ class ModelTrainer:
         self.path_dict = path_dict
 
     def train_with_temp_features(self):
-
         model_path = os.path.join(self.path_dict['SAVE_RUNTIME_FEATURES'], 'runtime_model')
         compiled_model = load_model(model_path)
 
         X = np.load(os.path.join(self.path_dict['SAVE_RUNTIME_FEATURES'], 'FeaturesX.npy'))
         Y = np.load(os.path.join(self.path_dict['SAVE_RUNTIME_FEATURES'], 'FeaturesY.npy'))
 
-        X = X[:, :, np.newaxis]
+        unique_elements = {}
+        label_code = 0
+        for i in Y:
+            if i not in unique_elements:
+                unique_elements[i] = label_code
+                label_code += 1
 
-        label_dict, Y = self.string_labels_to_categorical(Y)
+        new_labels = []
+        for i in Y:
+            new_labels.append(unique_elements[i])
+
+        Y = np.asarray(new_labels)
+        X = X[:, :, np.newaxis]
+        Y = Y[:, np.newaxis]
 
         if self.use_random_state:
             X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=self.test_split_rate, random_state=42)
@@ -40,9 +50,6 @@ class ModelTrainer:
             X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=self.test_split_rate)
 
         print('{} oranında test ve train olarak bölündü.'.format(self.test_split_rate))
-
-        print('Etiketler ve eğitimdeki Değerleri')
-        print(json.dumps(label_dict, indent=1))
 
         print("Tensorboard hazırlanıyor..")
         print("DİKKAT! Tensorboard'ın programca açılması için programı yetkili kullanıcı olarak başlatmayı unutmayın.")
