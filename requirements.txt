@@ -1,6 +1,6 @@
 pandas==1.1.4
 scikit-image==0.16.2
-tensorflow==2.2.0
+tensorflow==2.4.0
 
 keras~=2.4.3
 librosa~=0.8.0
