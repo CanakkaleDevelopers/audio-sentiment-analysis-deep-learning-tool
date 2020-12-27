@@ -9,7 +9,7 @@ from library.DataAugmentator import DataAugmentator
 
 
 class FeatureExtractor:
-    def __init__(self, feature_extraction_dict,data_augmentation_dict, db_datasetmeta):
+    def __init__(self, feature_extraction_dict, data_augmentation_dict, db_datasetmeta):
         self.data_augmentator = DataAugmentator(data_augmentation_dict)
         self.sampling_rate = feature_extraction_dict['sampling_rate']
         self.duration = feature_extraction_dict['duration']
@@ -19,7 +19,6 @@ class FeatureExtractor:
         self.augmentations = feature_extraction_dict['augmentations']
         self.trim_long_data = feature_extraction_dict['trim_long_data']
         self.db_datasetmeta = db_datasetmeta
-
 
     # todo -> add normalize = True
     def read_audio(self, pathname):
@@ -87,7 +86,6 @@ class FeatureExtractor:
         # eğer data augmentation varsa veriye manipüle et yoksa devam
         if make_augmentations:
             data = self.augment_data(data)
-
         # Get features
         sample_rate = self.sampling_rate
         stft = np.abs(librosa.stft(data))
@@ -119,13 +117,11 @@ class FeatureExtractor:
 
         return extracted_features, lenght
 
-
     @staticmethod
     def scale_minmax(X, min=0.0, max=1.0):
         X_std = (X - X.min()) / (X.max() - X.min())
         X_scaled = X_std * (max - min) + min
         return X_scaled
-
 
     def extract_with_database(self):
         # Before extraction loop variables decleration block
@@ -141,7 +137,8 @@ class FeatureExtractor:
         for datasetmeta in self.db_datasetmeta:  # -> veritabanındaki kayıt sayısı kadar dön
 
             # query record block
-            record = {'Gender': datasetmeta.gender, 'Emotion': datasetmeta.emotion, 'Source': datasetmeta.dataset_catalog.name, 'Path': datasetmeta.path,
+            record = {'Gender': datasetmeta.gender, 'Emotion': datasetmeta.emotion,
+                      'Source': datasetmeta.dataset_catalog.name, 'Path': datasetmeta.path,
                       'augment': True}  # burayı queryi yap sırayla oku qureyi yi bu şekilde getir veya alt tarafları düzenle
 
             print('Extracting selected features from  {} {} {} audio record. {} file left'.format(record['Source'],
@@ -158,15 +155,16 @@ class FeatureExtractor:
 
             # Extracting augmented file if True
             if record['augment']:
-                print('Extracting AUGMENTED record features from  {} {} {} audio record.'.format(
+                if self.augmentations != ['']:
+                    print('Extracting AUGMENTED record features from  {} {} {} audio record.'.format(
                     record['Source'],
                     record['Emotion'],
                     record['Gender'], ))
-                record_features, _ = self.extract(record['Path'], make_augmentations=True)
-                record_label = record['Emotion']
+                    record_features, _ = self.extract(record['Path'], make_augmentations=True)
+                    record_label = record['Emotion']
 
-                features_x = np.vstack([features_x, record_features])
-                features_y = np.hstack([features_y, record_label])
+                    features_x = np.vstack([features_x, record_features])
+                    features_y = np.hstack([features_y, record_label])
 
             # save block
 
@@ -189,7 +187,7 @@ class FeatureExtractor:
         """
 
         augmentation = self.augmentations
-
+        audio = None
         if 'white_noise' in augmentation:
             audio = self.data_augmentator.add_white_noise(data)
         if 'stretch' in augmentation:

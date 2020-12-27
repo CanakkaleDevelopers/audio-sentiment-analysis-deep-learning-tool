@@ -68,13 +68,12 @@ def web_create_features():
     a = request.form.to_dict(flat=True)
     a['features'] = request.form.getlist("features")
     a['augmentations'] = request.form.getlist("augmentations")
-    a['sampling_rate'] = float(a['sampling_rate'])
-    a['duration'] = float(a['duration'])
-    a['n_mfcc'] = float(a['n_mfcc'])
-    a['sampling_rate'] = float(a['sampling_rate'])
-    a['pitch_pm'] = float(a['pitch_pm'])
-    a['bins_per_octave'] = float(a['bins_per_octave'])
-    a['shift_rate'] = float(a['shift_rate'])
+    a['sampling_rate'] = int(a['sampling_rate'])
+    a['duration'] = int(a['duration'])
+    a['n_mfcc'] = int(a['n_mfcc'])
+    a['pitch_pm'] = int(a['pitch_pm'])
+    a['bins_per_octave'] = int(a['bins_per_octave'])
+    a['shift_rate'] = int(a['shift_rate'])
     a['speed_change'] = float(a['speed_change'])
     a['trim_long_data'] = bool(strtobool(a['trim_long_data']))
 
@@ -342,4 +341,4 @@ def datametacsv_to_database():
 if __name__ == '__main__':
     db.app = app
     db.create_all()
-    app.run(threaded=True, debug=False)
+    app.run(threaded=True, debug=True)
