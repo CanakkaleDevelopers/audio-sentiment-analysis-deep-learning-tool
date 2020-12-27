@@ -18,6 +18,7 @@ db.init_app(app)
 @app.route('/')
 def page_welcome():
     init_config()
+    db.session.commit()
     return render_template("index.html")
 
 
@@ -98,6 +99,7 @@ def web_create_model_conv_1d():
                                kernel_size=request.form.get("kernel_size"), padding=request.form.get("padding"))
         db.session.add(model_conv1d)
         db.session.flush()
+        db.session.commit()
         return redirect(url_for('web_create_model'))
         # print(request.form.to_dict(flat=True))
     else:
@@ -110,6 +112,7 @@ def web_create_model_dropout():
         model_dropout = DbModel(type="dropout", rate=request.form.get("rate"))
         db.session.add(model_dropout)
         db.session.flush()
+        db.session.commit()
         return redirect(url_for('web_create_model'))
         # print(request.form.to_dict(flat=True))
     else:
@@ -122,6 +125,7 @@ def web_create_model_dense():
         model_dense = DbModel(type="dense", units=request.form.get("units"), activation=request.form.get("activation"))
         db.session.add(model_dense)
         db.session.flush()
+        db.session.commit()
         return redirect(url_for('web_create_model'))
         # print(request.form.to_dict(flat=True))
     else:
@@ -133,6 +137,7 @@ def web_create_model_batch_normalization():
     model_batch = DbModel(type="batch_normalization")
     db.session.add(model_batch)
     db.session.flush()
+    db.session.commit()
     return redirect(url_for('web_create_model'))
 
 
@@ -141,6 +146,7 @@ def web_create_model_flatten():
     model_flatten = DbModel(type="flatten")
     db.session.add(model_flatten)
     db.session.flush()
+    db.session.commit()
     return redirect(url_for('web_create_model'))
 
 
@@ -161,6 +167,7 @@ def web_create_compile_config():
     a = request.form.to_dict(flat=True)
     model_builder = NewModelBuilder(DbConfig.query.first().__dict__, DbModel.query.all(), a)
     model_builder.build()
+    db.session.commit()
     return "finished"\
 
 @app.route("/select_model_trainer")
@@ -183,6 +190,7 @@ def web_model_trainer():
     model_trainer = ModelTrainer(model_train_config=a, path_dict=DbConfig.query.first().__dict__,
                                     tensorboard_config=a)
     model_trainer.train_with_temp_features()
+    db.session.commit()
 
 
 
