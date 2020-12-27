@@ -54,9 +54,7 @@ class NewModelBuilder:
             if layer_type == 'conv_1d':
                 new_layer = keras.layers.Conv1D(**layer)
                 print('conv_1d katmanı eklendi.')
-
             elif layer_type == 'dropout':
-
                 print('Dropout katmanı eklendi.')
                 new_layer = keras.layers.Dropout(**layer)
             elif layer_type == 'dense':
