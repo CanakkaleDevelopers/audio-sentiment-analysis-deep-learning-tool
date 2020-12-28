@@ -9,7 +9,8 @@
         <form action="{{url_for('web_create_metadata')}}" method="post"  enctype="application/x-www-form-urlencoded" target="_blank">
             <div class="form-group form-check">
                 {% for dataset in datasets %}
-                    <input name="{{ dataset.name }}" type="checkbox" class="form-check-input" id="{{ dataset.name }}">
+                    <input  {% if dataset.isdownloaded == "0" %}
+                         disabled {% endif %} name="{{ dataset.name }}" type="checkbox" class="form-check-input" id="{{ dataset.name }}">
                     <label class="form-check-label" for="{{ dataset.name }}">{{ dataset.name }}</label>
                     <label class="form-check-label" for="{{ dataset.name }}">| {% if dataset.isdownloaded == "1" %}
                         İNDİRİLDİ{% else %}İNDİRİLMEDİ{% endif %}</label>
@@ -21,5 +22,13 @@
             </div>
             <button type="submit" class="btn btn-primary">ONAYLA</button>
         </form>
+        <br>
+        <a href="{{url_for('web_delete_metadata')}}" >
+            <button type="submit" class="btn btn-danger">TÜM METADATALARI SİL</button>
+        </a>
+
+        <a href="{{url_for('web_select_features')}}" >
+            <button type="submit" class="btn btn-primary">Öznitelik Çıkarıcı</button>
+        </a>
     </div>
 {% endblock %}

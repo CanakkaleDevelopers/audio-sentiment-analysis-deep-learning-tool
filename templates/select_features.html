@@ -4,10 +4,20 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">FEATURE EXTRACTION PANELİ</h1>
 
+
     </div>
+    {% if temp %}
+        <div class="d-sm-flex align-items-center justify-content-center mb-4">
+            <h4>Çıkartılmış Öznitelik Dosyası Bulundu.Silmek ister misiniz?</h4>
+            <a href="{{ url_for('web_delete_features') }}">
+                <button type="submit" class="btn btn-danger">Sil</button>
+            </a>
+
+        </div>
+    {% endif %}
     <div>
         <form action="{{ url_for('web_create_features') }}" method="post" enctype="application/x-www-form-urlencoded"
-              target="_blank">
+              >
             <div class="form-group form-text">
                 <label for="sampling_rate">sampling_rate (default olarak kalması tercih edilir.)</label>
                 <input type="text" id="sampling_rate" value="44100" name="sampling_rate" class="form-control" readonly>
@@ -140,5 +150,9 @@
             </div>
 
         </form>
+        <br>
+        <a href="{{ url_for('web_create_model') }}">
+            <button type="submit" class="btn btn-primary">Model Oluşturucu</button>
+        </a>
     </div>
 {% endblock %}

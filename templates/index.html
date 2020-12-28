@@ -7,32 +7,38 @@
     </div>
     <div class="text-center">
 
-        <a href="{{ url_for('web_select_dataset') }}" target="_blank">
+        <a href="{{ url_for('web_select_dataset') }}" >
             <button type="submit" class="btn btn-primary">Dataset Seçimi</button>
         </a>
         <br>
         <br>
         <br>
-        <a href="{{ url_for('web_select_metadata') }}" target="_blank">
+        <a href="{{ url_for('web_select_metadata') }}" >
             <button type="submit" class="btn btn-primary">Metadata Seçimi</button>
         </a>
         <br>
         <br>
         <br>
-        <a href="{{url_for('web_select_features')}}" target="_blank">
+        <a href="{{url_for('web_select_features')}}" >
             <button type="submit" class="btn btn-primary">Öznitelik Çıkarıcı</button>
         </a>
         <br>
         <br>
         <br>
-        <a href="{{url_for('web_create_model')}}" target="_blank">
+        <a href="{{url_for('web_create_model')}}" >
             <button type="submit" class="btn btn-primary">Model Oluşturucu</button>
         </a>
         <br>
         <br>
         <br>
-        <a href="{{url_for('web_select_compile_config')}}" target="_blank">
+        <a href="{{url_for('web_select_compile_config')}}" >
             <button type="submit" class="btn btn-primary">Model Derleme Yapılandırması</button>
+        </a>
+        <br>
+        <br>
+        <br>
+        <a href="{{url_for('web_select_model_trainer')}}" >
+            <button type="submit" class="btn btn-primary">Model Eğitimi</button>
         </a>
         <br>
         <br>
