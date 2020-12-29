@@ -3,7 +3,15 @@
 {% block content %}
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Model Eğitimi Yapılandırması</h1>
-
+        {% if temp %}
+        <div class="d-sm-flex align-items-center justify-content-center mb-4">
+            <h4>Derlenmiş model bulundu.</h4>
+        </div>
+            {% else %}
+             <div class="d-sm-flex align-items-center justify-content-center mb-4">
+            <h4 class="btn-danger">Derlenmiş model dosyası BULUNAMADI.Bu işlem yapılamaz.</h4>
+        </div>
+    {% endif %}
     </div>
     <div>
         <form action="{{ url_for('web_model_trainer') }}" method="post"

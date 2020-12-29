@@ -22,6 +22,9 @@
                     <a class="dropdown-item" href="#!"></a>
                 </div>
             </div>
+           <a href="{{url_for('web_delete_all_layers')}}" >
+            <button type="submit" class="btn btn-danger">Tüm Katmanları Sil</button>
+        </a>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -69,5 +72,9 @@
                 </table>
             </div>
         </div>
+    <br>
+        <a href="{{url_for('web_select_compile_config')}}" >
+            <button type="submit" class="btn btn-primary">Model Derleme Yapılandırması</button>
+        </a>
     </div>
 {% endblock %}

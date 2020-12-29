@@ -18,18 +18,57 @@ db.init_app(app)
 @app.route('/')
 def page_welcome():
     init_config()
+    db.session.commit()
     return render_template("index.html")
 
 
 @app.route('/select_dataset')
 def web_select_dataset():
+    import os
+    path = "Datasets"
+    if not os.path.exists(path):
+        try:
+            os.mkdir(path)
+        except OSError:
+            print("Creation of the directory %s failed" % path)
+        else:
+            print("Successfully created the directory %s " % path)
+
+    path = "Downloads"
+    if not os.path.exists(path):
+        try:
+            os.mkdir(path)
+        except OSError:
+            print("Creation of the directory %s failed" % path)
+        else:
+            print("Successfully created the directory %s " % path)
+
     return render_template("select_dataset.html", datasets=DbDatasetCatalog.query.all())
 
 
 @app.route('/download_dataset', methods=['POST'])
 def web_download_dataset():
     download_datasets(list(request.form.keys()))
-    return "download_dataset_finished"
+    return redirect(url_for("web_select_dataset"))
+
+
+@app.route('/delete_datasets')
+def web_delete_datasets():
+    import shutil
+    try:
+        shutil.rmtree('Datasets')
+    except OSError as e:
+        print("Error: %s - %s." % (e.filename, e.strerror))
+
+    try:
+        shutil.rmtree('Downloads')
+    except OSError as e:
+        print("Error: %s - %s." % (e.filename, e.strerror))
+
+    for data in DbDatasetCatalog.query.all():
+        data.isdownloaded = 0
+    db.session.commit()
+    return redirect(url_for("web_select_dataset"))
 
 
 @app.route('/select_metadata')
@@ -42,12 +81,34 @@ def web_create_metadata():
     metadata_creator = MetaDataCreator(DbConfig.query.first().__dict__)
     metadata_creator.create_csv(list(request.form.keys()))
     datametacsv_to_database()
+    for meta in list(request.form.keys()):
+        DbDatasetCatalog.query.filter(DbDatasetCatalog.name == meta).first().ismeta = 1
+    db.session.commit()
     return "tamam"
+
+
+@app.route('/delete_metadata')
+def web_delete_metadata():
+    DbDatasetMeta.query.delete()
+    for x in DbDatasetCatalog.query.all():
+        x.ismeta = 0
+
+    db.session.commit()
+    return redirect(url_for('web_select_metadata'))
 
 
 @app.route("/select_features")
 def web_select_features():
-    return render_template("select_features.html")
+    import os.path
+    temp = []
+    temp2 = []
+    if os.path.isfile(DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'FeaturesX.npy') and os.path.isfile(
+            DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'FeaturesY.npy'):
+        temp = True
+    else:
+        temp = False
+
+    return render_template("select_features.html", temp=temp)
 
 
 @app.route("/create_features", methods=['POST'])
@@ -67,13 +128,12 @@ def web_create_features():
     a = request.form.to_dict(flat=True)
     a['features'] = request.form.getlist("features")
     a['augmentations'] = request.form.getlist("augmentations")
-    a['sampling_rate'] = float(a['sampling_rate'])
-    a['duration'] = float(a['duration'])
-    a['n_mfcc'] = float(a['n_mfcc'])
-    a['sampling_rate'] = float(a['sampling_rate'])
-    a['pitch_pm'] = float(a['pitch_pm'])
-    a['bins_per_octave'] = float(a['bins_per_octave'])
-    a['shift_rate'] = float(a['shift_rate'])
+    a['sampling_rate'] = int(a['sampling_rate'])
+    a['duration'] = int(a['duration'])
+    a['n_mfcc'] = int(a['n_mfcc'])
+    a['pitch_pm'] = int(a['pitch_pm'])
+    a['bins_per_octave'] = int(a['bins_per_octave'])
+    a['shift_rate'] = int(a['shift_rate'])
     a['speed_change'] = float(a['speed_change'])
     a['trim_long_data'] = bool(strtobool(a['trim_long_data']))
 
@@ -82,7 +142,19 @@ def web_create_features():
 
     f.extract_with_database()
 
-    return "finished"
+    return redirect(url_for("web_select_features"))
+
+
+@app.route("/delete_features")
+def web_delete_features():
+    import os
+    try:
+        os.remove(DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'FeaturesX.npy')
+        os.remove(DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'FeaturesY.npy')
+    except:
+        print("Dosyalar bulunamadı. Silme işleminde problem oluştu.")
+
+    return redirect(url_for('web_select_features'))
 
 
 @app.route('/create_model')
@@ -98,6 +170,7 @@ def web_create_model_conv_1d():
                                kernel_size=request.form.get("kernel_size"), padding=request.form.get("padding"))
         db.session.add(model_conv1d)
         db.session.flush()
+        db.session.commit()
         return redirect(url_for('web_create_model'))
         # print(request.form.to_dict(flat=True))
     else:
@@ -110,6 +183,7 @@ def web_create_model_dropout():
         model_dropout = DbModel(type="dropout", rate=request.form.get("rate"))
         db.session.add(model_dropout)
         db.session.flush()
+        db.session.commit()
         return redirect(url_for('web_create_model'))
         # print(request.form.to_dict(flat=True))
     else:
@@ -122,6 +196,7 @@ def web_create_model_dense():
         model_dense = DbModel(type="dense", units=request.form.get("units"), activation=request.form.get("activation"))
         db.session.add(model_dense)
         db.session.flush()
+        db.session.commit()
         return redirect(url_for('web_create_model'))
         # print(request.form.to_dict(flat=True))
     else:
@@ -133,6 +208,7 @@ def web_create_model_batch_normalization():
     model_batch = DbModel(type="batch_normalization")
     db.session.add(model_batch)
     db.session.flush()
+    db.session.commit()
     return redirect(url_for('web_create_model'))
 
 
@@ -141,6 +217,7 @@ def web_create_model_flatten():
     model_flatten = DbModel(type="flatten")
     db.session.add(model_flatten)
     db.session.flush()
+    db.session.commit()
     return redirect(url_for('web_create_model'))
 
 
@@ -151,9 +228,29 @@ def web_delete_model_layer(layer_id):
     return redirect(url_for('web_create_model'))
 
 
+@app.route('/delete_layer')
+def web_delete_all_layers():
+    DbModel.query.delete()
+    db.session.commit()
+    return redirect(url_for('web_create_model'))
+
+
 @app.route("/select_compile_config")
 def web_select_compile_config():
-    return render_template("select_compile_config.html")
+    import os
+    temp = []
+    temp2 = []
+    if os.path.isfile(DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'FeaturesX.npy') and os.path.isfile(
+            DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'FeaturesY.npy'):
+        temp = True
+    else:
+        temp = False
+
+    if os.path.isfile(DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'runtime_model/saved_model.pb'):
+        temp2 = True
+    else:
+        temp2 = False
+    return render_template("select_compile_config.html", temp=temp, temp2=temp2)
 
 
 @app.route("/create_compile_config", methods=['POST'])
@@ -161,11 +258,30 @@ def web_create_compile_config():
     a = request.form.to_dict(flat=True)
     model_builder = NewModelBuilder(DbConfig.query.first().__dict__, DbModel.query.all(), a)
     model_builder.build()
-    return "finished"\
+    db.session.commit()
+    return redirect(url_for("web_select_compile_config"))
+
+
+@app.route("/delete_compile_config")
+def web_delete_compile_config():
+    import shutil
+    try:
+        shutil.rmtree('TEMP/runtime_model')
+    except OSError as e:
+        print("Error: %s - %s." % (e.filename, e.strerror))
+    return redirect(url_for('web_select_compile_config'))
+
 
 @app.route("/select_model_trainer")
 def web_select_model_trainer():
-    return render_template("select_model_trainer.html")
+    import os
+    temp = []
+
+    if os.path.isfile(DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'runtime_model/saved_model.pb'):
+        temp = True
+    else:
+        temp = False
+    return render_template("select_model_trainer.html", temp = temp)
 
 
 @app.route("/model_trainer", methods=['POST'])
@@ -181,10 +297,9 @@ def web_model_trainer():
     a['epochs'] = int(a['epochs'])
     a['validation_split_rate'] = float(a['validation_split_rate'])
     model_trainer = ModelTrainer(model_train_config=a, path_dict=DbConfig.query.first().__dict__,
-                                    tensorboard_config=a)
+                                 tensorboard_config=a)
     model_trainer.train_with_temp_features()
-
-
+    db.session.commit()
 
     print(a)
     # model_builder = NewModelBuilder(DbConfig.query.first().__dict__, DbModel.query.all(), a)
@@ -308,6 +423,10 @@ def download_datasets(datasets):
     dataset_explorer = DatasetExplorer(datasets, DbConfig.query.first().__dict__)
     dataset_explorer.scan()
     dataset_explorer.download_datasets()
+    for data in datasets:
+        DbDatasetCatalog.query.filter(DbDatasetCatalog.name == data).first().isdownloaded = 1
+    db.session.commit()
+
     print("Dataset indirme işlemi tamamlandı.")
     print("----------------")
     del dataset_explorer
@@ -329,9 +448,11 @@ def datametacsv_to_database():
     db.session.commit()
     from os import remove
     remove(DbConfig.query.first().DATA_METADATA_DF_PATH)
+    DbDatasetMeta.query.filter(DbDatasetMeta.emotion == "unknown").delete()
+    db.session.commit()
 
 
 if __name__ == '__main__':
     db.app = app
     db.create_all()
-    app.run(threaded=True, debug=False)
+    app.run(threaded=True, debug=True)

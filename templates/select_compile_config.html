@@ -5,10 +5,26 @@
         <h1 class="h3 mb-0 text-gray-800">Model Derleme Yapılandırması</h1>
 
     </div>
+        {% if temp %}
+        <div class="d-sm-flex align-items-center justify-content-center mb-4">
+            <h4>Çıkartılmış Öznitelik Dosyası Bulundu.</h4>
+        </div>
+            {% else %}
+             <div class="d-sm-flex align-items-center justify-content-center mb-4">
+            <h4 class="btn-danger">Çıkartılmış Öznitelik Dosyası BULUNAMADI.Bu işlem yapılamaz.</h4>
+        </div>
+    {% endif %}
+
+    {% if temp2 %}
+        <div class="d-sm-flex align-items-center justify-content-center mb-4">
+            <h4>Derleme yapılmış model Bulundu.</h4>
+            <a href="{{ url_for("web_delete_compile_config") }}"><button class="btn btn-danger">Sil</button></a>
+        </div>
+    {% endif %}
     <div>
         <form action="{{ url_for('web_create_compile_config') }}" method="post"
               enctype="application/x-www-form-urlencoded"
-              target="_blank">
+              >
 
 
             <div class="form-group">
@@ -43,5 +59,9 @@
             </div>
 
         </form>
+<br>
+        <a href="{{url_for('web_select_model_trainer')}}" >
+            <button type="submit" class="btn btn-primary">Model Eğitimi</button>
+        </a>
     </div>
 {% endblock %}

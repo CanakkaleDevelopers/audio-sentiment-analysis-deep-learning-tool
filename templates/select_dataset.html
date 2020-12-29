@@ -6,7 +6,7 @@
 
     </div>
     <div>
-        <form action="{{url_for('web_download_dataset')}}" method="post"  enctype="application/x-www-form-urlencoded" target="_blank">
+        <form action="{{url_for('web_download_dataset')}}" method="post"  enctype="application/x-www-form-urlencoded" >
             <div class="form-group form-check">
                 {% for dataset in datasets %}
                     <input name="{{ dataset.name }}" type="checkbox" class="form-check-input" id="{{ dataset.name }}">
@@ -21,5 +21,13 @@
             </div>
             <button type="submit" class="btn btn-primary">ONAYLA</button>
         </form>
+        <br>
+            <a href="{{ url_for('web_delete_datasets') }}" >
+            <button type="submit" class="btn btn-danger">Tüm Datasetleri Sil</button>
+                </a>
+        <br>
+            <a href="{{ url_for('web_select_metadata') }}" >
+            <button type="submit" class="btn btn-primary">Metadata Seçimi</button>
+        </a>
     </div>
 {% endblock %}
