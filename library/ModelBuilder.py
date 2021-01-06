@@ -32,11 +32,11 @@ class NewModelBuilder:
             new_labels.append(unique_elements[i])
 
         Y = np.asarray(new_labels)
-        X = X[:, :, np.newaxis]
+        # X = X[:, :, np.newaxis]
         Y = Y[:, np.newaxis]
 
         input_shape = X.shape[1:]
-        output_shape = Y.shape[0]
+        output_shape = len(np.unique(Y))
 
         print(input_shape)
         print(output_shape)

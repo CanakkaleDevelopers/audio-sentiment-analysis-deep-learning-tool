@@ -41,7 +41,7 @@ class ModelTrainer:
             new_labels.append(unique_elements[i])
 
         Y = np.asarray(new_labels)
-        X = X[:, :, np.newaxis]
+        # X = X[:, :, np.newaxis]
         Y = Y[:, np.newaxis]
 
         if self.use_random_state:
@@ -65,6 +65,12 @@ class ModelTrainer:
         print("Eğitim başlıyor")
         compiled_model.fit(X, Y, validation_split=self.validation_split_rate, epochs=self.epochs, shuffle=True,
                            callbacks=[tensorboard_callback])
+
+        import pickle
+        with open('TEMP/tags', 'wb') as file:
+            pickle.dump(unique_elements,file)
+
+        compiled_model.save('TEMP/model.h5')
 
     def string_labels_to_categorical(self, labels):
 

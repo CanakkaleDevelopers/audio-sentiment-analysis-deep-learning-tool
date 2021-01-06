@@ -138,6 +138,11 @@ def web_create_features():
     a['trim_long_data'] = bool(strtobool(a['trim_long_data']))
 
     print(a)
+    # Çıkartılan özniteliklerin prediction aşamasında kullanılabilmesi için dump edilmiştir.
+    import pickle
+    with open('TEMP/initFeatureExtractor', 'wb') as file:
+        pickle.dump(a, file)
+
     f = FeatureExtractor(a, a, DbDatasetMeta.query.all())  # feature_extraction_dict {} yolla
 
     f.extract_with_database()
@@ -245,7 +250,6 @@ def web_select_compile_config():
         temp = True
     else:
         temp = False
-
     if os.path.isfile(DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'runtime_model/saved_model.pb'):
         temp2 = True
     else:
@@ -281,7 +285,7 @@ def web_select_model_trainer():
         temp = True
     else:
         temp = False
-    return render_template("select_model_trainer.html", temp = temp)
+    return render_template("select_model_trainer.html", temp=temp)
 
 
 @app.route("/model_trainer", methods=['POST'])
@@ -311,6 +315,56 @@ def web_model_trainer():
 def temp_func():
     print()
     return "ok"
+
+
+@app.route('/features_reshape', methods=['POST', 'GET'])
+def web_features_reshape():
+    import numpy as np
+    features = np.load("TEMP/FeaturesX.npy")
+    print(features.shape)
+    if request.method == "GET":
+        features_shape = str(features.shape).translate({ord(i): None for i in '() '})
+        return render_template('select_features_shape.html', features_shape=features_shape)
+    if request.method == "POST":
+        new_shape = request.form.get('new_shape')
+        new_shape = tuple(map(int, new_shape.split(',')))
+        features = features.reshape(new_shape)
+        np.save("TEMP/FeaturesX.npy",features)
+        return redirect(url_for('web_features_reshape'))
+
+
+
+
+@app.route('/prediction')
+def web_prediction():
+    from tensorflow.keras.models import load_model
+    import pickle
+    try:
+        model = load_model('TEMP/model.h5')
+        print(model.summary())
+    except:
+        print("model dosyasi bulunamadı")
+        # return
+    try:
+        with open('TEMP/initFeatureExtractor', 'rb') as file:
+            a = pickle.load(file)
+        f = FeatureExtractor(a, a, None)  # feature_extraction_dict {} yolla
+    except:
+        print('initFeatureExtractor bulunamadi')
+
+    extracted_features, lenght = f.extract('./save_angry.wav', False)
+    print(extracted_features)
+    print(extracted_features.shape)
+    print(lenght)
+    extracted_features = extracted_features.reshape(1, 40, 1)
+    predicted = model.predict(extracted_features)
+    print(predicted)
+    with open('TEMP/tags', 'rb') as file:
+        b = pickle.load(file)
+    for key, value in b.items():
+        print('{0:.1f}'.format(predicted[0][value] * 100), key)
+
+    return "deneme"
 
 
 @app.teardown_appcontext
