@@ -73,7 +73,7 @@
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">İndirme ve Metadata</h6>
-                    <a class="collapse-item" href="{{ url_for('web_select_dataset') }}">Dataset İndirme</a>
+                    <a class="collapse-item" href="{{ url_for('web_select_dataset') }}">Veri Seti İndirme</a>
                     <a class="collapse-item" href="{{ url_for('web_select_metadata') }}">Metadata Oluşturma</a>
                 </div>
             </div>
@@ -101,6 +101,13 @@
                aria-expanded="true" aria-controls="collapseUtilities">
                 <i class="fas fa-fw fa-adjust"></i>
                 <span>Model Eğitimi</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('web_prediction')}}"
+               aria-expanded="true" aria-controls="collapseUtilities">
+                <i class="fas fa-fw fa-terminal"></i>
+                <span>Model Testi</span>
             </a>
         </li>
 

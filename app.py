@@ -6,12 +6,12 @@ from library.FeatureExtractor import FeatureExtractor
 from library.ModelBuilder import NewModelBuilder
 from library.ModelTrainer import ModelTrainer
 from database.models import DbDatasetCatalog, DbDatasetMeta, DbConfig, db, DbModel
-
-from multiprocessing import Process
-
+from werkzeug.utils import secure_filename
+UPLOAD_FOLDER = 'uploads'
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db.init_app(app)
 
 
@@ -114,16 +114,6 @@ def web_select_features():
 @app.route("/create_features", methods=['POST'])
 def web_create_features():
     from distutils.util import strtobool
-    # distutils.util.strtobool()
-    # feature_extraction_dict = {'sampling_rate': 44100, 'duration': 4, 'trim_long_data': False, 'n_mfcc': 40,
-    #                            'features': ['mfcc'],
-    #                            'augmentations': ['white_noise', 'stretch', 'shift', 'change_speed']}
-    # data_augmentation_dict = {'shift_rate': 1600, 'stretch_rate': 1, 'speed_change': 1,
-    #                           'pitch_pm': 24, 'bins_per_octave': 24}
-    # f = FeatureExtractor(feature_extraction_dict, data_augmentation_dict)  # feature_extraction_dict {} yolla,
-    #
-    # f.extract_with_database()  # bu fonksiyonun içerisine query yerleştirilecek
-
     # Bu işlem selectbox üzerinden gelen verilerin flatten dict üzerinde gösterilememesinden dolayı yazılmıştır.
     a = request.form.to_dict(flat=True)
     a['features'] = request.form.getlist("features")
@@ -136,8 +126,6 @@ def web_create_features():
     a['shift_rate'] = int(a['shift_rate'])
     a['speed_change'] = float(a['speed_change'])
     a['trim_long_data'] = bool(strtobool(a['trim_long_data']))
-
-    print(a)
     # Çıkartılan özniteliklerin prediction aşamasında kullanılabilmesi için dump edilmiştir.
     import pickle
     with open('TEMP/initFeatureExtractor', 'wb') as file:
@@ -335,36 +323,43 @@ def web_features_reshape():
 
 
 
-@app.route('/prediction')
+@app.route('/prediction', methods=['POST','GET'])
 def web_prediction():
-    from tensorflow.keras.models import load_model
-    import pickle
-    try:
-        model = load_model('TEMP/model.h5')
-        print(model.summary())
-    except:
-        print("model dosyasi bulunamadı")
-        # return
-    try:
-        with open('TEMP/initFeatureExtractor', 'rb') as file:
-            a = pickle.load(file)
-        f = FeatureExtractor(a, a, None)  # feature_extraction_dict {} yolla
-    except:
-        print('initFeatureExtractor bulunamadi')
+    if request.method == 'GET':
+        return render_template('select_model_prediction.html')
 
-    extracted_features, lenght = f.extract('./save_angry.wav', False)
-    print(extracted_features)
-    print(extracted_features.shape)
-    print(lenght)
-    extracted_features = extracted_features.reshape(1, 40, 1)
-    predicted = model.predict(extracted_features)
-    print(predicted)
-    with open('TEMP/tags', 'rb') as file:
-        b = pickle.load(file)
-    for key, value in b.items():
-        print('{0:.1f}'.format(predicted[0][value] * 100), key)
+    if request.method == 'POST':
+        import os
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        from tensorflow.keras.models import load_model
+        import pickle
+        try:
+            model = load_model('TEMP/model.h5')
+            # print(model.summary())
+        except:
+            print("model dosyasi bulunamadı")
+            # return
+        try:
+            with open('TEMP/initFeatureExtractor', 'rb') as file:
+                a = pickle.load(file)
+            f = FeatureExtractor(a, a, None)  # feature_extraction_dict {} yolla
+        except:
+            print('initFeatureExtractor bulunamadi')
 
-    return "deneme"
+        extracted_features, lenght = f.extract('uploads/'+filename, False)
+        extracted_features = extracted_features.reshape(1, 40, 1)
+        predicted = model.predict(extracted_features)
+        predict_dict = {}
+        with open('TEMP/tags', 'rb') as file:
+            b = pickle.load(file)
+        for key, value in b.items():
+            # print('{0:.1f}'.format(predicted[0][value] * 100), key)
+            predict_dict[key] = '{0:.1f}'.format(predicted[0][value] * 100)
+
+
+        return render_template('select_model_prediction.html',predict = True , predict_dict = predict_dict )
 
 
 @app.teardown_appcontext
