@@ -17,11 +17,23 @@
                 <input type="text" id="kernel_size"  name="kernel_size" class="form-control">
             </div>
             <div class="form-group">
-                <label for="features">features</label>
+                <label for="features">padding</label>
                 <select class="form-control" id="padding" name="padding">
                     <option value="valid">valid</option>
                     <option value="same">same</option>
                     <option value="causal">causal</option>
+                </select>
+            </div>
+             <div class="form-group">
+                <label for="activation">activation</label>
+                <select class="form-control" id="activation" name="activation">
+                    <option value="relu">relu</option>
+                    <option value="sigmoid">sigmoid</option>
+                    <option value="softmax">softmax</option>
+                    <option value="softplus">softplus</option>
+                    <option value="tanh">tanh</option>
+                    <option value="selu">selu</option>
+                    <option value="elu">elu</option>
                 </select>
             </div>
             <div class="form-group ">

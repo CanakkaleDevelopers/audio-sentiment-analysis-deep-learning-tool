@@ -7,6 +7,7 @@ from library.ModelBuilder import NewModelBuilder
 from library.ModelTrainer import ModelTrainer
 from database.models import DbDatasetCatalog, DbDatasetMeta, DbConfig, db, DbModel
 from werkzeug.utils import secure_filename
+
 UPLOAD_FOLDER = 'uploads'
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/data.db'
@@ -160,7 +161,8 @@ def web_create_model():
 def web_create_model_conv_1d():
     if request.method == 'POST':
         model_conv1d = DbModel(type="conv_1d", filters=request.form.get("filters"),
-                               kernel_size=request.form.get("kernel_size"), padding=request.form.get("padding"))
+                               kernel_size=request.form.get("kernel_size"), padding=request.form.get("padding"),
+                               activation=request.form.get("activation"))
         db.session.add(model_conv1d)
         db.session.flush()
         db.session.commit()
@@ -205,6 +207,15 @@ def web_create_model_batch_normalization():
     return redirect(url_for('web_create_model'))
 
 
+@app.route('/create_model_max_pooling_1d')
+def web_create_model_max_pooling_1d():
+    model_batch = DbModel(type="max_pooling_1d")
+    db.session.add(model_batch)
+    db.session.flush()
+    db.session.commit()
+    return redirect(url_for('web_create_model'))
+
+
 @app.route('/create_model_flatten')
 def web_create_model_flatten():
     model_flatten = DbModel(type="flatten")
@@ -238,7 +249,7 @@ def web_select_compile_config():
         temp = True
     else:
         temp = False
-    if os.path.isfile(DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'runtime_model/saved_model.pb'):
+    if os.path.isfile(DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'runtime_model'):
         temp2 = True
     else:
         temp2 = False
@@ -256,9 +267,9 @@ def web_create_compile_config():
 
 @app.route("/delete_compile_config")
 def web_delete_compile_config():
-    import shutil
+    import os
     try:
-        shutil.rmtree('TEMP/runtime_model')
+        os.remove('TEMP/runtime_model')
     except OSError as e:
         print("Error: %s - %s." % (e.filename, e.strerror))
     return redirect(url_for('web_select_compile_config'))
@@ -269,7 +280,7 @@ def web_select_model_trainer():
     import os
     temp = []
 
-    if os.path.isfile(DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'runtime_model/saved_model.pb'):
+    if os.path.isfile(DbConfig.query.first().SAVE_RUNTIME_FEATURES + 'runtime_model'):
         temp = True
     else:
         temp = False
@@ -317,13 +328,11 @@ def web_features_reshape():
         new_shape = request.form.get('new_shape')
         new_shape = tuple(map(int, new_shape.split(',')))
         features = features.reshape(new_shape)
-        np.save("TEMP/FeaturesX.npy",features)
+        np.save("TEMP/FeaturesX.npy", features)
         return redirect(url_for('web_features_reshape'))
 
 
-
-
-@app.route('/prediction', methods=['POST','GET'])
+@app.route('/prediction', methods=['POST', 'GET'])
 def web_prediction():
     if request.method == 'GET':
         return render_template('select_model_prediction.html')
@@ -348,18 +357,16 @@ def web_prediction():
         except:
             print('initFeatureExtractor bulunamadi')
 
-        extracted_features, lenght = f.extract('uploads/'+filename, False)
-        extracted_features = extracted_features.reshape(1, 40, 1)
+        extracted_features, lenght = f.extract('uploads/' + filename, False)
+        extracted_features = extracted_features.reshape(1, 40,1)
         predicted = model.predict(extracted_features)
         predict_dict = {}
-        with open('TEMP/tags', 'rb') as file:
-            b = pickle.load(file)
-        for key, value in b.items():
+        dic  =  {0:'neutral', 1:'happy', 2:'sad', 3:'angry', 4:'fear', 5:'disgust', 6:'surprise', 7:'bored'}
+        for key, value in dic.items():
             # print('{0:.1f}'.format(predicted[0][value] * 100), key)
-            predict_dict[key] = '{0:.1f}'.format(predicted[0][value] * 100)
+            predict_dict[value] = '{0:.1f}'.format(predicted[0][key] * 100)
 
-
-        return render_template('select_model_prediction.html',predict = True , predict_dict = predict_dict )
+        return render_template('select_model_prediction.html', predict=True, predict_dict=predict_dict)
 
 
 @app.teardown_appcontext

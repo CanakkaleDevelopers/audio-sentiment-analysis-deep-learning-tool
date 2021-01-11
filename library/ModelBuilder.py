@@ -1,4 +1,5 @@
 import keras
+import tensorflow as tf
 import numpy as np
 import os
 
@@ -41,7 +42,7 @@ class NewModelBuilder:
         print(input_shape)
         print(output_shape)
 
-        model.add(keras.layers.InputLayer(input_shape=X.shape[1:]))  # input shape
+        model.add(keras.layers.Input(shape=X.shape[1:]))  # input shape
         layer_type = ''
         for layerx in self.model_layers:
             layer = layerx.__dict__
@@ -63,6 +64,9 @@ class NewModelBuilder:
             elif layer_type == 'batch_normalization':
                 print('Batch Normalization katmanı eklendi.')
                 new_layer = keras.layers.BatchNormalization()
+            elif layer_type == 'max_pooling_1d':
+                print('MaxPooling1D katmanı eklendi.')
+                new_layer = keras.layers.MaxPooling1D()
             elif layer_type == 'flatten':
                 print('Flatten katmanı eklendi..')
                 new_layer = keras.layers.Flatten()
@@ -73,6 +77,17 @@ class NewModelBuilder:
             model.add(new_layer)
 
         model.add(keras.layers.Dense(output_shape, activation='softmax'))  # output shape
+        print(model.summary())
+
+        print('Model, {} optimizeri, {} kayıp fonksiyonu ile derleniyor.'.format(self.compile_config['optimizer'],
+                                                                                 self.compile_config['loss']))
+
+        model.compile(optimizer=self.compile_config['optimizer'],
+                      loss=self.compile_config['loss'],
+                      metrics=['accuracy'])
+
+        import pickle
+        pickle.dump(self.compile_config, open("compile_config.p", "wb"))
 
         return model
 
@@ -80,17 +95,16 @@ class NewModelBuilder:
         print('Model, {} optimizeri, {} kayıp fonksiyonu ile derleniyor.'.format(self.compile_config['optimizer'],
                                                                                  self.compile_config['loss']))
 
-        uncompiled_model.compile(optimizer=self.compile_config['optimizer'],
-                                 loss=self.compile_config['loss'],
+        uncompiled_model.compile(optimizer='adam',
+                                 loss='sparse_categorical_crossentropy',
                                  metrics=['accuracy'])
-
         model = uncompiled_model
 
         return model
 
     def build(self):
         model = self.get_uncompiled_model()
-        model = self.get_compiled_model(model)
         model_path = os.path.join(self.path_dict['SAVE_RUNTIME_FEATURES'], 'runtime_model')
         print("Model TEMP klasörünün altına oluşturuldu")
-        model.save(model_path)
+        tf.keras.models.save_model(model, model_path, save_format='h5')
+        model.summary()
