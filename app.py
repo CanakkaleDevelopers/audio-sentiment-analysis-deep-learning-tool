@@ -411,13 +411,14 @@ def init_config():
             MODEL_WEIGHTS_PATH = 'ModelWeights\\'
             MODEL_TRAINING_PLOTS = 'TEMP\\Plots\\'
             TEST_FILES_PATH = 'pass\\'
-            DATA_METADATA_DF_PATH = 'TEMP\\datatable.csv'
+            DATA_METADATA_DF_PATH = 'TEMP\\metadata_table.csv'
             db_config = DbConfig(TRAINING_FILES_PATH, TRAINING_FILES_SPECTOGRAMS, SAVE_RUNTIME_FEATURES,
                                  SAVE_RUNTIME_FEATURES_X, SAVE_RUNTIME_FEATURES_Y, MODEL_FEATURES_PATH,
                                  MODEL_WEIGHTS_PATH, MODEL_TRAINING_PLOTS, TEST_FILES_PATH, RAVDESS_FILES_PATH,
                                  CREMA_D_FILES_PATH, SAVEE_FILES_PATH, EMODB_FILES_PATH, DATA_METADATA_DF_PATH,
                                  DOWNLOADS_FOLDER, DATASETS_FOLDER)
             db.session.add(db_config)
+            init_DbDatasetCatalog()
             db.session.flush()
 
         else:
@@ -468,6 +469,8 @@ def init_DbDatasetCatalog():
     db.session.add(DbDatasetCatalog("emoDB", 0, 0))
     db.session.add(DbDatasetCatalog("Ravdess", 0, 0))
     db.session.add(DbDatasetCatalog("SAVEE", 0, 0))
+    db.session.commit()
+    db.session.flush()
     print("Catalog İşlemi Tamamlandı.")
     print("----------------")
 
