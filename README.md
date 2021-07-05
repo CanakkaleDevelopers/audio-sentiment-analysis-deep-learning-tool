@@ -13,3 +13,8 @@ then
 ```
 pip install -r requirements.txt
 ```
+
+```
+"Bu çalışmaya ait deneysel sonuçlar ve ilgili bildiri makalesi ICONDATA 2021 isimli uluslararası konferansda sunulmuştur. Çalışmada katkıda bulunanlar bildirideki isim sırasına göre:
+Emir Ali Kıvrak, Bahadır Karasulu, Can Sözbir, Atakan Türkay"
+```
