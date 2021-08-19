@@ -2,7 +2,7 @@ import numpy as np
 import os
 import json
 from sklearn.model_selection import train_test_split
-from keras.utils import to_categorical
+from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import TensorBoard
 import datetime
