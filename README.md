@@ -27,7 +27,7 @@ python3 app.py or python app.py
 ```
 
 
-"Bu çalışmaya ait deneysel sonuçlar ve ilgili bildiri makalesi ICONDATA 2021 isimli uluslararası konferansda sunulmuştur. 
-Çalışmada katkıda bulunanlar bildirideki isim sırasına göre:
+"ICONDATA BİLDİRİ KİTAPLARI (Proceedings Books) Abstract Book (DRAFT):
+http://www.icondata.org/uploads/kcfinder/upload/files/Abstract_Book_2021_Draft.pdf
 Emir Ali Kıvrak, Bahadır Karasulu, Can Sözbir, Atakan Türkay"
 
