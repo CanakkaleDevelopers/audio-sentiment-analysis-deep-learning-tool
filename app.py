@@ -383,13 +383,14 @@ def shutdown_session(exception=None):
 # Config olarak kullanılan kesinleştirilmiş veri yolları veri tabanına eğer kayıt yok ise kaydediliyor.
 # Bu kayıtlar buradan değiştirilip veritabanı silindiği zaman otomatik olarak değiştirilmiş olarak kaydedilecektir.
 def init_config():
+    import os
+    import sys
     print("----------------")
     print("Config işlemi başlatılıyor...")
 
     if (DbConfig.query.all().__len__() == 0):
         print("Config Bulunamadı , Oluşturuluyor.")
-        import os
-        import sys
+
 
         working_dir_path = os.path.dirname(os.path.abspath(__file__))
         if sys.platform.startswith('win32'):
@@ -410,7 +411,7 @@ def init_config():
             MODEL_WEIGHTS_PATH = 'ModelWeights\\'
             MODEL_TRAINING_PLOTS = 'TEMP\\Plots\\'
             TEST_FILES_PATH = 'pass\\'
-            DATA_METADATA_DF_PATH = 'TEMP\\datatable.csv'
+            DATA_METADATA_DF_PATH = 'TEMP\\metadata_table.csv'
             db_config = DbConfig(TRAINING_FILES_PATH, TRAINING_FILES_SPECTOGRAMS, SAVE_RUNTIME_FEATURES,
                                  SAVE_RUNTIME_FEATURES_X, SAVE_RUNTIME_FEATURES_Y, MODEL_FEATURES_PATH,
                                  MODEL_WEIGHTS_PATH, MODEL_TRAINING_PLOTS, TEST_FILES_PATH, RAVDESS_FILES_PATH,
@@ -453,6 +454,15 @@ def init_config():
         print("Config Dosyası bulundu.")
 
     print("Config İşlemi Tamamlandı.")
+
+    path = "TEMP"
+    if not os.path.exists(path):
+        try:
+            os.mkdir(path)
+        except OSError:
+            print("Creation of the directory %s failed" % path)
+        else:
+            print("Successfully created the directory %s " % path)
 
     print("----------------")
 
