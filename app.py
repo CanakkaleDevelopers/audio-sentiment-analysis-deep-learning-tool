@@ -417,6 +417,7 @@ def init_config():
                                  CREMA_D_FILES_PATH, SAVEE_FILES_PATH, EMODB_FILES_PATH, DATA_METADATA_DF_PATH,
                                  DOWNLOADS_FOLDER, DATASETS_FOLDER)
             db.session.add(db_config)
+            init_DbDatasetCatalog()
             db.session.flush()
 
         else:
