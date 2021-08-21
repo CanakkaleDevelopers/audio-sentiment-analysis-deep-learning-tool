@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
-from library.DatasetExplorer import DatasetExplorer
+from werkzeug.utils import secure_filename
+
+from database.models import DbDatasetCatalog, DbDatasetMeta, DbConfig, db, DbModel
 from library.DataMetaDataCreator import MetaDataCreator
+from library.DatasetExplorer import DatasetExplorer
 from library.FeatureExtractor import FeatureExtractor
 from library.ModelBuilder import NewModelBuilder
 from library.ModelTrainer import ModelTrainer
-from database.models import DbDatasetCatalog, DbDatasetMeta, DbConfig, db, DbModel
-from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = 'uploads'
 app = Flask(__name__)
@@ -85,7 +85,7 @@ def web_create_metadata():
     for meta in list(request.form.keys()):
         DbDatasetCatalog.query.filter(DbDatasetCatalog.name == meta).first().ismeta = 1
     db.session.commit()
-    return "tamam"
+    return redirect(url_for("web_select_metadata"))
 
 
 @app.route('/delete_metadata')
@@ -310,12 +310,6 @@ def web_model_trainer():
     return "finished"
 
 
-@app.route('/test')
-def temp_func():
-    print()
-    return "ok"
-
-
 @app.route('/features_reshape', methods=['POST', 'GET'])
 def web_features_reshape():
     import numpy as np
@@ -358,13 +352,19 @@ def web_prediction():
             print('initFeatureExtractor bulunamadi')
 
         extracted_features, lenght = f.extract('uploads/' + filename, False)
-        extracted_features = extracted_features.reshape(1, 40,1)
+        import numpy as np
+        extracted_features = np.expand_dims(extracted_features , axis = 1)
+        extracted_features = np.expand_dims(extracted_features , axis = 0)
+        print(extracted_features.shape)
         predicted = model.predict(extracted_features)
         predict_dict = {}
         dic  =  {0:'neutral', 1:'happy', 2:'sad', 3:'angry', 4:'fear', 5:'disgust', 6:'surprise', 7:'bored'}
         for key, value in dic.items():
             # print('{0:.1f}'.format(predicted[0][value] * 100), key)
-            predict_dict[value] = '{0:.1f}'.format(predicted[0][key] * 100)
+            try:
+                predict_dict[value] = '{0:.1f}'.format(predicted[0][key] * 100)
+            except:
+                pass
 
         return render_template('select_model_prediction.html', predict=True, predict_dict=predict_dict)
 
@@ -390,7 +390,6 @@ def init_config():
         print("Config Bulunamadı , Oluşturuluyor.")
         import os
         import sys
-        import pathlib
 
         working_dir_path = os.path.dirname(os.path.abspath(__file__))
         if sys.platform.startswith('win32'):

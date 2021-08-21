@@ -6,7 +6,7 @@
 
     </div>
     <div>
-        <form action="{{url_for('web_create_metadata')}}" method="post"  enctype="application/x-www-form-urlencoded" target="_blank">
+        <form action="{{url_for('web_create_metadata')}}" method="post"  enctype="application/x-www-form-urlencoded">
             <div class="form-group form-check">
                 {% for dataset in datasets %}
                     <input  {% if dataset.isdownloaded == "0" %}
