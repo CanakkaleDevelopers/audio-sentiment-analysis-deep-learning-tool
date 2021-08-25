@@ -162,6 +162,8 @@ class MetaDataCreator:
                         emotion.append('happy')
                     elif name[5] == 'T':  # Trauer -> Sadness
                         emotion.append('sad')
+                    elif name[5] == 'N':
+                        emotion.append('neutral')
                     else:
                         emotion.append('unknown')
                 else:
@@ -178,6 +180,8 @@ class MetaDataCreator:
                         emotion.append('happy')
                     elif name[5] == 'T':  # Trauer -> Sadness
                         emotion.append('sad')
+                    elif name[5] == 'N':
+                        emotion.append('neutral')
                     else:
                         emotion.append('unknown')
 
