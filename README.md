@@ -4,6 +4,8 @@ A research tool for anybody can build, train, test and analysis deep learning mo
 
 
 **TR  Bu çalışmanın ileri aşamadaki sonuçları [Veri Bilimi](https://dergipark.org.tr/en/pub/veri) dergi'sinde (ISSN:2667-582X) bilimsel makale olarak yayımlanmak üzere hakem incelemesindedir.**
+
+
 **EN The advanced results of this study are under peer review to be published as a scientific article in the [Veri Bilimi (Data Science)](https://dergipark.org.tr/en/pub/veri) journal (ISSN:2667-582X)**
 
 ## Features
