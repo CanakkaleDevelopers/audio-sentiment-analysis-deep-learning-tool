@@ -67,10 +67,10 @@ Hosting public datasets in a AWS S3 bucket for fast download and a link that we'
 
 | Dataset | Official Page |
 | ------ | ------ |
-| RAVDESS | [Link](https://www.google.com/search?q=ravdess&rlz=1C1FKPE_trTR967TR967&oq=ravdess&aqs=chrome.0.35i39j69i59j0i512j0i20i263i512l2j0i512l5.2190j0j7&sourceid=chrome&ie=UTF-8)|
-| SAVEE | [Link](http://kahlan.eps.surrey.ac.uk/savee/)|
-| Emo-DB | [Link](http://emodb.bilderbar.info/start.html)|
-| CREMA-D  | [Link](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4313618/)|
+| RAVDESS [1] | [Link](https://www.google.com/search?q=ravdess&rlz=1C1FKPE_trTR967TR967&oq=ravdess&aqs=chrome.0.35i39j69i59j0i512j0i20i263i512l2j0i512l5.2190j0j7&sourceid=chrome&ie=UTF-8)|
+| SAVEE [2] | [Link](http://kahlan.eps.surrey.ac.uk/savee/)|
+| Emo-DB [3] | [Link](http://emodb.bilderbar.info/start.html)|
+| CREMA-D [4]  | [Link](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4313618/)|
 
 
 ## Backends
@@ -110,3 +110,9 @@ In training page we can set validation test split, batch size, epoch count etc.
 <img  width="500" height="500" src="https://i.im.ge/2021/09/01/Q1PF51.png">
 
 
+## Citation for datasets.
+
+[1]     Livingstone SR, Russo FA. “The Ryerson Audio-Visual Database of Emotional Speech and Song (RAVDESS)  A dynamic, multimodal set of facial and vocal expressions in North American English”. PIoS one, 13(5), e0196391, 2018.
+[2]     Haq S, Jackson PJB. “Speaker-Dependent Audio-Visual Emotion Recognition (SAVEE)”. AVSP, 53-58, 2009.
+[3]     Burkhardt F, Paescheke A, Rolfes M, Sendlmeier F, Weiss B.  “A database of German emotional speech”.  9th European Conference on Speech Communication and Technology, 2005.
+[4]     Cao H, Copper DG, Keutmann MK, Gur RC, Nenkova A, Verma R. “CREMA-D: Crowd-sourced Emotional Multimodal Actors Dataset”. IEEE Transactions on Affective Computing, 5(4), 377-390, 2014.
