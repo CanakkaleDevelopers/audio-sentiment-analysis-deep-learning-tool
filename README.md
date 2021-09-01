@@ -47,14 +47,10 @@ python3 app.py or python app.py
 After running app.py from your terminal, go to http://127.0.0.1:5000/ with your browser. If everythings went right, you have to see DepSemo main page. You can navigate between modueles via toolbar on left.
 
 
-
 > Remember, you have to download dataset for create metadata, and have to train a model before test a model, so go one by one for create a classifier model!
-> 
->
 
-
-
-
+<br />
+<br />
 ---
 
 ## Known Datasets
