@@ -42,7 +42,7 @@ python3 app.py or python app.py
 
 # How to Use 
 
-<img align="left" width="150" height="300" src="https://i.im.ge/2021/09/01/Q1Nter.png">
+<img align="left" width="150" height="250" src="https://i.im.ge/2021/09/01/Q1Nter.png">
 
 After running app.py from your terminal, go to http://127.0.0.1:5000/ with your browser. If everythings went right, you have to see DepSemo main page. You can navigate between modueles via toolbar on left.
 
