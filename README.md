@@ -49,6 +49,11 @@ After running app.py from your terminal, go to http://127.0.0.1:5000/ with your 
 > Remember, you have to download dataset for create metadata, and have to train a model before test a model, so go one by one for create a classifier model!
 
 
+
+
+
+---
+
 ## Known Datasets
 
 Hosting public datasets in a AWS S3 bucket for fast download and a link that we're sure works.
