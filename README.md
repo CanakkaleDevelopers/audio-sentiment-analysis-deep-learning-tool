@@ -100,11 +100,11 @@ Diffrent tools and frameworks has been used for accomplish this task.
 * Under MIT license.
 
 ## Screenshots
-
-<img  width="500" height="500" src="https://i.im.ge/2021/09/01/Q1PurP.md.png">
 In Feature extraction page, we can extract desired audio features from per auido.
+<img  width="500" height="500" src="https://i.im.ge/2021/09/01/Q1PurP.md.png">
 
-
-<img  width="500" height="500" src="https://i.im.ge/2021/09/01/Q1PF51.png">
+<br/>
 In training page we can set validation test split, batch size, epoch count etc.
+<img  width="500" height="500" src="https://i.im.ge/2021/09/01/Q1PF51.png">
+
 
