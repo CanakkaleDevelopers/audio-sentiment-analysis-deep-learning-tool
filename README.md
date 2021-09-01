@@ -93,7 +93,7 @@ Diffrent tools and frameworks has been used for accomplish this task.
 
 ## License and Citation 
 
-* Under MIT Licanse.
+* Under MIT license.
 
 ## Screenshots
 
