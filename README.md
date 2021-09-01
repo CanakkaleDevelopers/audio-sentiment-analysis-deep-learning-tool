@@ -97,7 +97,7 @@ Diffrent tools and frameworks has been used for accomplish this task.
 
 ## Screenshots
 
-<img width="500" height="500" src="https://i.im.ge/2021/09/01/Q1PurP.md.png">
-<img width="500" height="500" src="https://i.im.ge/2021/09/01/Q1PF51.png">
+<img align="left" width="500" height="500" src="https://i.im.ge/2021/09/01/Q1PurP.md.png">
+<img align="right" width="500" height="500" src="https://i.im.ge/2021/09/01/Q1PF51.png">
 
 
