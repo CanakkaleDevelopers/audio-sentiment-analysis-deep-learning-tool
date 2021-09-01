@@ -46,125 +46,50 @@ python3 app.py or python app.py
 
 After running app.py from your terminal, go to http://127.0.0.1:5000/ with your browser. If everythings went right, you have to see DepSemo main page. You can navigate between modueles via toolbar on left.
 
-
-This text you see here is *actually- written in Markdown! To get a feel
-for Markdown's syntax, type some text into the left window and
-watch the results in the right.
-
-## Tech
-
-Dillinger uses a number of open source projects to work properly:
+> Remember, you have to download dataset for create metadata, and have to train a model before test a model, so go one by one for create a classifier model!
 
 
+## Known Datasets
 
-## Installation
+Hosting public datasets in a AWS S3 bucket for fast download and a link that we're sure works.
 
-Dillinger requires [Node.js](https://nodejs.org/) v10+ to run.
-
-Install the dependencies and devDependencies and start the server.
-
-```sh
-cd dillinger
-npm i
-node app
-```
-
-For production environments...
-
-```sh
-npm install --production
-NODE_ENV=production node app
-```
-
-## Plugins
-
-Dillinger is currently extended with the following plugins.
-Instructions on how to use them in your own application are linked below.
-
-| Plugin | README |
+| Dataset | Official Page |
 | ------ | ------ |
-| Dropbox | [plugins/dropbox/README.md][PlDb] |
-| GitHub | [plugins/github/README.md][PlGh] |
-| Google Drive | [plugins/googledrive/README.md][PlGd] |
-| OneDrive | [plugins/onedrive/README.md][PlOd] |
-| Medium | [plugins/medium/README.md][PlMe] |
-| Google Analytics | [plugins/googleanalytics/README.md][PlGa] |
+| RAVDESS | [Link](https://www.google.com/search?q=ravdess&rlz=1C1FKPE_trTR967TR967&oq=ravdess&aqs=chrome.0.35i39j69i59j0i512j0i20i263i512l2j0i512l5.2190j0j7&sourceid=chrome&ie=UTF-8)|
+| SAVEE | [Link](http://kahlan.eps.surrey.ac.uk/savee/)|
+| Emo-DB | [Link](http://emodb.bilderbar.info/start.html)|
+| CREMA-D  | [Link](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4313618/)|
 
-## Development
 
-Want to contribute? Great!
+## Backends
 
-Dillinger uses Gulp + Webpack for fast developing.
-Make a change in your file and instantaneously see your updates!
+Diffrent tools and frameworks has been used for accomplish this task.
 
-Open your favorite Terminal and run these commands.
+| Used For | Framework & Tool  |
+| ------ | ------ |
+| FLASK | Web backend |
+| KERAS | Deep learning API with TensorFlow backend|
+| Librosa | Audio feature extractions and data augmentation|
+| TensorBoard | Training live feedback GUI|
+| SQLITE | Local database |
+| AWS S3 | Cloud database |
+| Pandas & Numpy | Generic usage |
 
-First Tab:
 
-```sh
-node app
-```
+## Contributors
 
-Second Tab:
+- [Emir Kivrak](https://github.com/emirkivrak)
+- [Assoc. Prof. Dr. Bahadır Karasulu](https://scholar.google.com.tr/citations?user=NEhs3ttTIzkC&hl=tr)
+- [Can Sözbir](https://github.com/cansozbir)
+- [Atakan Türkay](https://github.com/atakanhr)
 
-```sh
-gulp watch
-```
+## License and Citation 
 
-(optional) Third:
+* Under MIT Licanse.
 
-```sh
-karma test
-```
+## Screenshots
 
-#### Building for source
+<img width="500" height="500" src="https://i.im.ge/2021/09/01/Q1PurP.md.png">
+<img width="500" height="500" src="https://i.im.ge/2021/09/01/Q1PF51.png">
 
-For production release:
 
-```sh
-gulp build --prod
-```
-
-Generating pre-built zip archives for distribution:
-
-```sh
-gulp build dist --prod
-```
-
-## Docker
-
-Dillinger is very easy to install and deploy in a Docker container.
-
-By default, the Docker will expose port 8080, so change this within the
-Dockerfile if necessary. When ready, simply use the Dockerfile to
-build the image.
-
-```sh
-cd dillinger
-docker build -t <youruser>/dillinger:${package.json.version} .
-```
-
-This will create the dillinger image and pull in the necessary dependencies.
-Be sure to swap out `${package.json.version}` with the actual
-version of Dillinger.
-
-Once done, run the Docker image and map the port to whatever you wish on
-your host. In this example, we simply map port 8000 of the host to
-port 8080 of the Docker (or whatever port was exposed in the Dockerfile):
-
-```sh
-docker run -d -p 8000:8080 --restart=always --cap-add=SYS_ADMIN --name=dillinger <youruser>/dillinger:${package.json.version}
-```
-
-> Note: `--capt-add=SYS-ADMIN` is required for PDF rendering.
-
-Verify the deployment by navigating to your server address in
-your preferred browser.
-
-```sh
-127.0.0.1:8000
-```
-
-## License
-
-MIT
