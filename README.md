@@ -113,6 +113,9 @@ In training page we can set validation test split, batch size, epoch count etc.
 ## Citation for datasets.
 
 [1]     Livingstone SR, Russo FA. “The Ryerson Audio-Visual Database of Emotional Speech and Song (RAVDESS)  A dynamic, multimodal set of facial and vocal expressions in North American English”. PIoS one, 13(5), e0196391, 2018.
+
 [2]     Haq S, Jackson PJB. “Speaker-Dependent Audio-Visual Emotion Recognition (SAVEE)”. AVSP, 53-58, 2009.
+
 [3]     Burkhardt F, Paescheke A, Rolfes M, Sendlmeier F, Weiss B.  “A database of German emotional speech”.  9th European Conference on Speech Communication and Technology, 2005.
+
 [4]     Cao H, Copper DG, Keutmann MK, Gur RC, Nenkova A, Verma R. “CREMA-D: Crowd-sourced Emotional Multimodal Actors Dataset”. IEEE Transactions on Affective Computing, 5(4), 377-390, 2014.
