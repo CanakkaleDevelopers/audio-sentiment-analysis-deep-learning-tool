@@ -87,6 +87,8 @@ Diffrent tools and frameworks has been used for accomplish this task.
 | AWS S3 | Cloud database |
 | Pandas & Numpy | Generic usage |
 
+## System Architecture
+<img  src="https://i.im.ge/2021/09/02/Q1CFz0.png">
 
 ## Contributors
 
