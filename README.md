@@ -3,10 +3,10 @@
 A research tool for anybody can build, train, test and analysis deep learning models on audio data for the purpose of emotion classification.
 
 
-**TR  Bu çalışmanın ileri aşamadaki sonuçları [Veri Bilimi](https://dergipark.org.tr/en/pub/veri) dergi'sinde (ISSN:2667-582X) bilimsel makale olarak yayımlanmak üzere hakem incelemesindedir.**
+**TR  Bu çalışma [Veri Bilimi](https://dergipark.org.tr/en/pub/veri) dergi'sinde yayınlanmıştır. [Link](https://dergipark.org.tr/tr/pub/veri/issue/67424/963310) **
 
 
-**EN The advanced results of this study are under peer review to be published as a scientific article in the [Veri Bilimi (Data Science)](https://dergipark.org.tr/en/pub/veri) journal (ISSN:2667-582X)**
+**EN This article was published in the [Veri Bilimi (Data Science)](https://dergipark.org.tr/en/pub/veri) journal. [Link](https://dergipark.org.tr/tr/pub/veri/issue/67424/963310) **
 
 ## Features
 
